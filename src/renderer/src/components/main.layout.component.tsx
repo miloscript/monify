@@ -1,38 +1,59 @@
-import React from 'react'
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList
+} from '@renderer/components/atoms/navigation-menu/navigation-menu.component'
+
 import { Link } from 'react-router-dom'
 
 interface Props {
   children: React.ReactNode
 }
 
-export const MainLayout = ({ children }: Props) => {
+const headerConfig = [
+  {
+    name: 'Invoices',
+    path: '/'
+  },
+  {
+    name: 'Expenses',
+    path: '/expenses'
+  },
+  {
+    name: 'Tracker',
+    path: '/tracker'
+  },
+  {
+    name: 'Forecast',
+    path: '/forecast'
+  },
+  {
+    name: 'Settings',
+    path: '/settings'
+  }
+]
+
+export const MainLayout = ({ children }: Props): JSX.Element => {
   return (
     <div>
-      <div className="navbar bg-base-100 border">
-        <div className="flex-1">
-          <a className="btn btn-ghost normal-case text-xl">monify.finance</a>
-        </div>
-        <div className="flex-none">
-          <ul className="menu menu-horizontal px-1">
-            <li>
-              <Link to={`/`}>Invoices</Link>
-            </li>
-            <li>
-              <Link to={`/expenses`}>Expenses</Link>
-            </li>
-            <li>
-              <Link to={`/tracker`}>Tracker</Link>
-            </li>
-            <li>
-              <Link to={`/forecast`}>Forecast</Link>
-            </li>
-            <li>
-              <Link to={`/settings`}>Settings</Link>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div className="px-10 pt-10">{children}</div>
+      <header className="flex flex-row justify-between px-6 py-4 border-b">
+        <NavigationMenuItem className="hover:bg-accent px-4 py-1 rounded">
+          <p>monify.finance</p>
+        </NavigationMenuItem>
+        <NavigationMenu className="justify-end">
+          <NavigationMenuList className="gap-x-1">
+            {headerConfig.map((item, index) => (
+              <NavigationMenuItem className="hover:bg-accent px-4 py-1 rounded" key={index}>
+                <NavigationMenuLink>
+                  <Link to={item.path}>{item.name}</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            ))}
+          </NavigationMenuList>
+        </NavigationMenu>
+      </header>
+      <div className="p-6">{children}</div>
     </div>
   )
 }

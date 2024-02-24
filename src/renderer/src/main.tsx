@@ -4,6 +4,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
+import { ExpensesPage } from './pages/expenses.page'
 import { InvoicesPage } from './pages/invoices.page'
 
 const router = createBrowserRouter([
@@ -13,7 +14,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/expenses',
-    element: <InvoicesPage />
+    element: <ExpensesPage />
   },
   {
     path: '/tracker',
