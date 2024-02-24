@@ -3,7 +3,7 @@ import {
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList
-} from '@renderer/components/atoms/navigation-menu/navigation-menu.component'
+} from '@renderer/components/elements/navigation-menu/navigation-menu.component'
 
 import { Link } from 'react-router-dom'
 
