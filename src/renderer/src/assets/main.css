@@ -6,6 +6,23 @@ html * {
   list-style: none;
 }
 
+body {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+header {
+  -webkit-app-region: drag;
+}
+
+button {
+  -webkit-app-region: no-drag;
+}
+
+a {
+  -webkit-app-region: no-drag;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

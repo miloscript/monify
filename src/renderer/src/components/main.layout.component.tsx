@@ -4,8 +4,9 @@ import {
   NavigationMenuLink,
   NavigationMenuList
 } from '@renderer/components/elements/navigation-menu/navigation-menu.component'
+import { cn } from '@renderer/lib/utils'
 
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 interface Props {
   children: React.ReactNode
@@ -24,6 +25,11 @@ const headerConfig = [
 ]
 
 export const MainLayout = ({ children }: Props): JSX.Element => {
+  const location = useLocation()
+  const isActive = (path: string) => {
+    if (path === '/') return location.pathname === path
+    return location.pathname.startsWith(path)
+  }
   return (
     <div>
       <header className="flex flex-row justify-between px-6 py-4 border-b">
@@ -34,7 +40,13 @@ export const MainLayout = ({ children }: Props): JSX.Element => {
           <NavigationMenuList className="gap-x-1">
             {headerConfig.map((item, index) => (
               <NavigationMenuItem key={index}>
-                <NavigationMenuLink className="hover:bg-accent px-4 py-1 rounded" asChild>
+                <NavigationMenuLink
+                  className={cn(
+                    'hover:bg-accent px-4 py-1 rounded',
+                    isActive(item.path) && 'bg-accent'
+                  )}
+                  asChild
+                >
                   <Link to={item.path}>{item.name}</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
