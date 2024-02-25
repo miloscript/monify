@@ -24,10 +24,6 @@ const initialState: DataState = {
   clients: []
 }
 
-type DataAction = {
-  setCompanyInfo(company: Pick<DataState, 'company'>): void
-}
-
 // Custom storage object
 const storage: StateStorage = {
   getItem: async (): Promise<string | null> => {
@@ -43,6 +39,12 @@ const storage: StateStorage = {
   }
 }
 
+type DataAction = {
+  setCompanyInfo(company: Pick<DataState, 'company'>): void
+  addClient(client: DataState['clients'][0]): void
+  removeClient(clientId: string): void
+}
+
 const useDataStore = create<DataState & DataAction>()(
   persist(
     (set) => ({
@@ -54,6 +56,14 @@ const useDataStore = create<DataState & DataAction>()(
             ...state.company,
             ...payload.company
           }
+        })),
+      addClient: (client) =>
+        set((state) => ({
+          clients: [...state.clients, client]
+        })),
+      removeClient: (clientId) =>
+        set((state) => ({
+          clients: state.clients.filter((client) => client.id !== clientId)
         }))
     }),
     {

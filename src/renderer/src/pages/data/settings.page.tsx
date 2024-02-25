@@ -5,6 +5,7 @@ import {
   TabsTrigger
 } from '@renderer/components/elements/tabs/tabs.component'
 import { MainLayout } from '@renderer/components/main.layout.component'
+import { ClientsTab } from './tabs/clients/clients.tab.settings'
 import { CompanyTab } from './tabs/company.tab.settings'
 
 export const SettingsPage: React.FC = () => {
@@ -23,7 +24,9 @@ export const SettingsPage: React.FC = () => {
           <TabsContent value="company">
             <CompanyTab />
           </TabsContent>
-          <TabsContent value="clients">Change your password here.</TabsContent>
+          <TabsContent value="clients">
+            <ClientsTab />
+          </TabsContent>
           <TabsContent value="projects">Projects.</TabsContent>
           <TabsContent value="user">User.</TabsContent>
         </Tabs>

@@ -16,18 +16,7 @@ const headerConfig = [
     name: 'Invoices',
     path: '/'
   },
-  {
-    name: 'Expenses',
-    path: '/expenses'
-  },
-  {
-    name: 'Tracker',
-    path: '/tracker'
-  },
-  {
-    name: 'Forecast',
-    path: '/forecast'
-  },
+
   {
     name: 'Settings',
     path: '/settings'

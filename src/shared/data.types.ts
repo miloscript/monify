@@ -29,7 +29,8 @@ interface HourlyRate {
 }
 
 interface Client extends Company {
-  projects: Project[]
+  id: string
+  projects?: Project[]
   hourlyRate: HourlyRate[]
 }
 
