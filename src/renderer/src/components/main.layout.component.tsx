@@ -44,8 +44,8 @@ export const MainLayout = ({ children }: Props): JSX.Element => {
         <NavigationMenu className="justify-end">
           <NavigationMenuList className="gap-x-1">
             {headerConfig.map((item, index) => (
-              <NavigationMenuItem className="hover:bg-accent px-4 py-1 rounded" key={index}>
-                <NavigationMenuLink>
+              <NavigationMenuItem key={index}>
+                <NavigationMenuLink className="hover:bg-accent px-4 py-1 rounded" asChild>
                   <Link to={item.path}>{item.name}</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
@@ -53,7 +53,7 @@ export const MainLayout = ({ children }: Props): JSX.Element => {
           </NavigationMenuList>
         </NavigationMenu>
       </header>
-      <div className="p-6">{children}</div>
+      <div className="px-8 py-2">{children}</div>
     </div>
   )
 }

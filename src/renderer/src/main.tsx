@@ -4,6 +4,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
+import { SettingsPage } from './pages/data/settings.page'
 import { ExpensesPage } from './pages/expenses.page'
 import { InvoicesPage } from './pages/invoices.page'
 
@@ -17,16 +18,8 @@ const router = createBrowserRouter([
     element: <ExpensesPage />
   },
   {
-    path: '/tracker',
-    element: <InvoicesPage />
-  },
-  {
-    path: '/forecast',
-    element: <InvoicesPage />
-  },
-  {
     path: '/settings',
-    element: <InvoicesPage />
+    element: <SettingsPage />
   }
 ])
 
