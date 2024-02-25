@@ -1,8 +1,8 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import { BrowserWindow, app, ipcMain, shell } from 'electron'
-import fs from 'fs'
+import { BrowserWindow, app, shell } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
+import { attachEvents } from './ipc/main.ipc'
 
 function createWindow(): void {
   // Create the browser window.
@@ -50,17 +50,8 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('setData', (_, data) => {
-    const stateFile = app.getPath('userData') + '/data/state.json'
-    if (!fs.existsSync(stateFile)) {
-      fs.writeFileSync(stateFile, JSON.stringify({}))
-    }
-    console.log(stateFile)
-
-    // const stateFile = app.getPath('userData') + '/data/state.json'
-    // fs.writeFileSync(stateFile, JSON.stringify(data))
-  })
+  // Attach the IPC events used for cross-process communication
+  attachEvents()
 
   createWindow()
 

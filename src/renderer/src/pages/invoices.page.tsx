@@ -1,26 +1,27 @@
-import { FormInput } from '@renderer/components/elements/form-input/form-input.component'
-import { FormLabel } from '@renderer/components/elements/form-label/form-label.component'
 import { Typography } from '@renderer/components/elements/typography/typography.component'
 import { MainLayout } from '@renderer/components/main.layout.component'
-import { useState } from 'react'
+import useDataStore from '@renderer/store/data.store'
 
 export const InvoicesPage: React.FC = () => {
-  const [invoiceConfig, setInvoiceConfig] = useState({
-    invoiceDate: '01.01.2024',
-    invoiceNumber: 'MOT01/24',
-    performancePeriod: '01.01.2024 - 01.02.2024'
-  })
+  const state = useDataStore((state) => state)
 
-  const ipcHandle = (value: string): void => window.electron.ipcRenderer.send('ping', value)
+  // const [invoiceConfig, setInvoiceConfig] = useState({
+  //   invoiceDate: '01.01.2024',
+  //   invoiceNumber: 'MOT01/24',
+  //   performancePeriod: '01.01.2024 - 01.02.2024'
+  // })
 
-  const invoiceConfigSet = (key: string, value: string): void => {
-    setInvoiceConfig({ ...invoiceConfig, [key]: value })
-    ipcHandle(value)
-  }
+  // const ipcHandle = (value: string): void => window.electron.ipcRenderer.send('ping', value)
+
+  // const invoiceConfigSet = (key: string, value: string): void => {
+  //   setInvoiceConfig({ ...invoiceConfig, [key]: value })
+  //   ipcHandle(value)
+  // }
   return (
     <MainLayout>
-      <div className="flex flex-col gap-6">
-        <Typography element="h3">Invoice config</Typography>
+      <Typography element="h3">Invoice config</Typography>
+      {state.company.name && <Typography element="h3">{state.company.name}</Typography>}
+      {/* <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <FormLabel>Invoice date</FormLabel>
           <FormInput
@@ -51,7 +52,7 @@ export const InvoicesPage: React.FC = () => {
             }}
           />
         </div>
-      </div>
+      </div> */}
     </MainLayout>
   )
 }

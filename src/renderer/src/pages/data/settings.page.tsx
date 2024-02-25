@@ -11,7 +11,7 @@ export const SettingsPage: React.FC = () => {
   return (
     <MainLayout>
       <div className="flex flex-col gap-6">
-        <Tabs defaultValue="account">
+        <Tabs defaultValue="company">
           <TabsList className="flex justify-between">
             <div>
               <TabsTrigger value="company">Company</TabsTrigger>

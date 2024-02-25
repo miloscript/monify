@@ -9,6 +9,8 @@ import {
 } from '@renderer/components/atoms/form/form.component'
 import { FormInput } from '@renderer/components/elements/form-input/form-input.component'
 import { FormLabel } from '@renderer/components/elements/form-label/form-label.component'
+import useDataStore from '@renderer/store/data.store'
+import { DataState } from '@shared/data.types'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -111,24 +113,46 @@ const formSchema = z.object({
 })
 
 export const CompanyTab: React.FC = () => {
+  const { company, setCompanyInfo } = useDataStore((state) => state)
+
   const { watch, ...form } = useForm({
     shouldFocusError: false,
     resolver: zodResolver(formSchema),
     defaultValues: {
-      companyName: '',
-      taxId: '',
-      street: '',
-      number: '',
-      city: '',
-      zip: '',
-      country: '',
-      personName: '',
-      phone: '',
-      email: ''
+      companyName: company.name,
+      taxId: company.taxId,
+      street: company.address.street,
+      number: company.address.number,
+      city: company.address.city,
+      zip: company.address.zip,
+      country: company.address.country,
+      personName: company.contact?.name,
+      phone: company.contact?.phone,
+      email: company.contact?.email
     }
   })
 
-  const onSubmit = (data) => window.electron.ipcRenderer.send('setData', data)
+  const onSubmit = (data) => {
+    const payload: Pick<DataState, 'company'> = {
+      company: {
+        name: data.companyName,
+        taxId: data.taxId,
+        address: {
+          street: data.street,
+          number: data.number,
+          city: data.city,
+          zip: data.zip,
+          country: data.country
+        },
+        contact: {
+          name: data.personName,
+          phone: data.phone,
+          email: data.email
+        }
+      }
+    }
+    setCompanyInfo(payload)
+  }
 
   useEffect(() => {
     const subscription = watch(() => {

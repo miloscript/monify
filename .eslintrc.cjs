@@ -7,6 +7,7 @@ module.exports = {
     '@electron-toolkit/eslint-config-prettier'
   ],
   rules: {
-    'react/prop-types': [0]
+    'react/prop-types': [0],
+    '@typescript-eslint/explicit-function-return-type': ['off']
   }
 }
