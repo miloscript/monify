@@ -11,7 +11,7 @@ export const Typography = ({ element, className, children }: TypographyProps): J
 
   const getStyles = (element): string => {
     if (element === 'h3') return 'text-2xl font-semibold leading-none tracking-tight'
-    return 'text-2xl font-semibold leading-none tracking-tight'
+    return 'text-md leading-none tracking-tight'
   }
 
   return <Comp className={cn(getStyles(element), className)}>{children}</Comp>

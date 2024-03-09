@@ -19,8 +19,8 @@ const headerConfig = [
   },
 
   {
-    name: 'Settings',
-    path: '/settings'
+    name: 'Data',
+    path: '/data'
   }
 ]
 

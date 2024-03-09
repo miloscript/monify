@@ -1,3 +1,9 @@
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbSeparator
+} from '@renderer/components/elements/breadcrumbs/breadcrumbs.component'
 import { Button } from '@renderer/components/elements/button/button.component'
 import {
   Table,
@@ -16,9 +22,11 @@ import {
 } from '@renderer/components/elements/tabs/tabs.component'
 import useDataStore from '@renderer/store/data.store'
 import { Edit, Trash2 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { AddClientForm } from './add-client.form'
 
 export const ClientsTab: React.FC = () => {
+  const navigate = useNavigate()
   const { clients, removeClient } = useDataStore((state) => state)
 
   const handleRemoveClient = (clientId: string) => {
@@ -33,7 +41,15 @@ export const ClientsTab: React.FC = () => {
         </div>
         <TabsTrigger value="add-client">Add Client</TabsTrigger>
       </TabsList>
+
       <TabsContent value="clients">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem variant="active">Clients</BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem variant="active">View All</BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
         <Table>
           <TableCaption>A list of your clients.</TableCaption>
           <TableHeader>
@@ -67,22 +83,19 @@ export const ClientsTab: React.FC = () => {
             ))}
           </TableBody>
         </Table>
-
-        {/* {clients.map((client) => (
-          <div key={client.id}>
-            <h2>{client.name}</h2>
-            <p>{client.taxId}</p>
-            <p>
-              {client.address.street} {client.address.number}
-            </p>
-            <p>
-              {client.address.zip} {client.address.city}
-            </p>
-            <p>{client.address.country}</p>
-          </div>
-        ))} */}
       </TabsContent>
       <TabsContent value="add-client">
+        <BreadcrumbList>
+          <BreadcrumbItem
+            onClick={() => {
+              navigate('/settings')
+            }}
+          >
+            Clients
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem variant="active">Add Client</BreadcrumbItem>
+        </BreadcrumbList>
         <AddClientForm />
       </TabsContent>
     </Tabs>
