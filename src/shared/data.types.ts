@@ -1,4 +1,4 @@
-interface Company {
+export interface Company {
   name: string
   taxId: string
   address: {
@@ -28,7 +28,7 @@ interface HourlyRate {
   dateActive: Date
 }
 
-interface Client extends Company {
+export interface Client extends Company {
   id: string
   projects?: Project[]
   hourlyRate: HourlyRate[]

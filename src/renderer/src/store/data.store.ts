@@ -42,6 +42,7 @@ const storage: StateStorage = {
 type DataAction = {
   setCompanyInfo(company: Pick<DataState, 'company'>): void
   addClient(client: DataState['clients'][0]): void
+  editClient(client: DataState['clients'][0]): void
   removeClient(clientId: string): void
 }
 
@@ -60,6 +61,10 @@ const useDataStore = create<DataState & DataAction>()(
       addClient: (client) =>
         set((state) => ({
           clients: [...state.clients, client]
+        })),
+      editClient: (client) =>
+        set((state) => ({
+          clients: state.clients.map((c) => (c.id === client.id ? client : c))
         })),
       removeClient: (clientId) =>
         set((state) => ({

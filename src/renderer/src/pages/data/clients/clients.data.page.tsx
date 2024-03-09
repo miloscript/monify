@@ -62,7 +62,12 @@ export const ClientsPage: React.FC = () => {
               </TableCell>
               <TableCell>{client.hourlyRate[0].rate}</TableCell>
               <TableCell className="text-right">
-                <Button variant="ghost">
+                <Button
+                  onClick={() => {
+                    navigate(`/data/clients/${client.id}/edit`)
+                  }}
+                  variant="ghost"
+                >
                   <Edit />
                 </Button>
                 <Button onClick={() => handleRemoveClient(client.id)} variant="ghost">
