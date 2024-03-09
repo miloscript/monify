@@ -20,8 +20,9 @@ export interface Project {
   name: string
   hourlyRate: HourlyRate[]
   additionalFields?: {
-    [key: string]: string
-  }
+    name: string
+    value: string
+  }[]
 }
 
 interface HourlyRate {

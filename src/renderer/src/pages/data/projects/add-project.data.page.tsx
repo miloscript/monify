@@ -24,38 +24,59 @@ import { useForm } from 'react-hook-form'
 import { v4 as uuidv4 } from 'uuid'
 import * as z from 'zod'
 
-const formFields = [
-  {
-    name: 'projectName',
-    label: 'Project Name',
-    placeholder: 'Enter project name'
-  },
-  {
-    name: 'hourlyRate',
-    type: 'number',
-    label: 'Hourly rate',
-    placeholder: 'Enter hourly rate'
-  }
-]
-
-const formSchema = z.object({
-  projectName: z
-    .string()
-    .transform((value) => value.trim())
-    .pipe(z.string().min(4, '123')),
-  hourlyRate: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
-    message: 'Expected number, received a string'
+const generateFormFields = (additionalFields: string[]) => {
+  const formFields = [
+    {
+      name: 'projectName',
+      label: 'Project Name',
+      placeholder: 'Enter project name'
+    },
+    {
+      name: 'hourlyRate',
+      type: 'number',
+      label: 'Hourly rate',
+      placeholder: 'Enter hourly rate'
+    }
+  ]
+  additionalFields.forEach((field) => {
+    formFields.push({
+      name: field,
+      label: field,
+      placeholder: `Enter ${field}`
+    })
   })
-})
+  return formFields
+}
 
 export const AddProjectPage: React.FC = () => {
   const navigate = useNavigate()
   const { clientId } = useParams()
-  const { addProject } = useDataStore((state) => state)
+  const { addProject, app } = useDataStore((state) => state)
+
+  const additionalFields = app.config.project.additionalFields
+
+  const generateFormSchema = (additionalFields: string[]) => {
+    const schema = {
+      projectName: z
+        .string()
+        .transform((value) => value.trim())
+        .pipe(z.string().min(4, '123')),
+      hourlyRate: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
+        message: 'Expected number, received a string'
+      })
+    }
+    additionalFields.forEach((field) => {
+      schema[field] = z
+        .string()
+        .transform((value) => value.trim())
+        .pipe(z.string().min(4, '123'))
+    })
+    return z.object(schema)
+  }
 
   const form = useForm({
     shouldFocusError: false,
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(generateFormSchema(additionalFields)),
     defaultValues: {
       projectName: '',
       hourlyRate: 0
@@ -73,7 +94,11 @@ export const AddProjectPage: React.FC = () => {
           rate: parseFloat(data.hourlyRate),
           dateActive: new Date()
         }
-      ]
+      ],
+      additionalFields: additionalFields.map((field) => ({
+        name: field,
+        value: data[field]
+      }))
     }
     addProject(clientId, project)
     navigate('/data/projects')
@@ -96,7 +121,7 @@ export const AddProjectPage: React.FC = () => {
 
       <Form {...form}>
         <form id="add-project" className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-          {formFields.map((formField) => (
+          {generateFormFields(additionalFields).map((formField) => (
             <FormField
               key={formField.name}
               control={form.control}
