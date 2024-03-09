@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { StateStorage, createJSONStorage, persist } from 'zustand/middleware'
 
 import { getData, saveData } from '@renderer/api/main.api'
-import { DataState } from '@shared/data.types'
+import { DataState, Project } from '@shared/data.types'
 
 const initialState: DataState = {
   company: {
@@ -44,6 +44,9 @@ type DataAction = {
   addClient(client: DataState['clients'][0]): void
   editClient(client: DataState['clients'][0]): void
   removeClient(clientId: string): void
+  addProject(clientId: string, project: Project): void
+  editProject(clientId: string, project: Project): void
+  removeProject(clientId: string, projectId: string): void
 }
 
 const useDataStore = create<DataState & DataAction>()(
@@ -57,6 +60,39 @@ const useDataStore = create<DataState & DataAction>()(
             ...state.company,
             ...payload.company
           }
+        })),
+      addProject: (clientId, project) =>
+        set((state) => ({
+          clients: state.clients.map((client) =>
+            client.id === clientId
+              ? {
+                  ...client,
+                  projects: client.projects ? [...client.projects, project] : [project]
+                }
+              : client
+          )
+        })),
+      editProject: (clientId, project) =>
+        set((state) => ({
+          clients: state.clients.map((client) =>
+            client.id === clientId
+              ? {
+                  ...client,
+                  projects: client.projects?.map((p) => (p.id === project.id ? project : p))
+                }
+              : client
+          )
+        })),
+      removeProject: (clientId, projectId) =>
+        set((state) => ({
+          clients: state.clients.map((client) =>
+            client.id === clientId
+              ? {
+                  ...client,
+                  projects: client.projects?.filter((project) => project.id !== projectId)
+                }
+              : client
+          )
         })),
       addClient: (client) =>
         set((state) => ({

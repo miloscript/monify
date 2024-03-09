@@ -50,11 +50,11 @@ const router = createHashRouter([
     element: <ProjectsPage />
   },
   {
-    path: '/data/projects/add',
+    path: '/data/projects/:clientId/add',
     element: <AddProjectPage />
   },
   {
-    path: '/data/projects/:id/edit',
+    path: '/data/projects/:clientId/:id/edit',
     element: <EditProjectPage />
   },
   {

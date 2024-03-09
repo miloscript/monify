@@ -8,7 +8,7 @@ import {
 import { Button } from '@renderer/components/elements/button/button.component'
 import { MainLayout } from '@renderer/components/main.layout.component'
 import useDataStore from '@renderer/store/data.store'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import {
   Form,
@@ -19,46 +19,16 @@ import {
 } from '@renderer/components/atoms/form/form.component'
 import { FormInput } from '@renderer/components/elements/form-input/form-input.component'
 import { FormLabel } from '@renderer/components/elements/form-label/form-label.component'
-import { DataState } from '@shared/data.types'
+import { Project } from '@shared/data.types'
 import { useForm } from 'react-hook-form'
 import { v4 as uuidv4 } from 'uuid'
 import * as z from 'zod'
 
 const formFields = [
   {
-    name: 'companyName',
-    label: 'Company Name',
-    placeholder: 'Enter company name'
-  },
-  {
-    name: 'taxId',
-    label: 'Tax ID',
-    placeholder: 'Enter tax ID'
-  },
-  {
-    name: 'street',
-    label: 'Street',
-    placeholder: 'Enter street'
-  },
-  {
-    name: 'number',
-    label: 'Number',
-    placeholder: 'Enter number'
-  },
-  {
-    name: 'city',
-    label: 'City',
-    placeholder: 'Enter city'
-  },
-  {
-    name: 'zip',
-    label: 'Zip',
-    placeholder: 'Enter zip'
-  },
-  {
-    name: 'country',
-    label: 'Country',
-    placeholder: 'Enter country'
+    name: 'projectName',
+    label: 'Project Name',
+    placeholder: 'Enter project name'
   },
   {
     name: 'hourlyRate',
@@ -69,34 +39,10 @@ const formFields = [
 ]
 
 const formSchema = z.object({
-  companyName: z
+  projectName: z
     .string()
     .transform((value) => value.trim())
     .pipe(z.string().min(4, '123')),
-  taxId: z
-    .string()
-    .transform((value) => value.trim())
-    .pipe(z.string().min(4, '123')),
-  street: z
-    .string()
-    .transform((value) => value.trim())
-    .pipe(z.string().min(1, '123')),
-  number: z
-    .string()
-    .transform((value) => value.trim())
-    .pipe(z.string().min(1, '123')),
-  city: z
-    .string()
-    .transform((value) => value.trim())
-    .pipe(z.string().min(1, '123')),
-  zip: z
-    .string()
-    .transform((value) => value.trim())
-    .pipe(z.string().min(1, '123')),
-  country: z
-    .string()
-    .transform((value) => value.trim())
-    .pipe(z.string().min(1, '123')),
   hourlyRate: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
     message: 'Expected number, received a string'
   })
@@ -104,35 +50,24 @@ const formSchema = z.object({
 
 export const AddProjectPage: React.FC = () => {
   const navigate = useNavigate()
-  const { addClient } = useDataStore((state) => state)
+  const { clientId } = useParams()
+  const { addProject } = useDataStore((state) => state)
 
   const form = useForm({
     shouldFocusError: false,
     resolver: zodResolver(formSchema),
     defaultValues: {
-      companyName: '',
-      taxId: '',
-      street: '',
-      number: '',
-      city: '',
-      zip: '',
-      country: '',
+      projectName: '',
       hourlyRate: 0
     }
   })
 
   const onSubmit = (data) => {
-    const client: DataState['clients'][0] = {
+    if (!clientId) return
+
+    const project: Project = {
       id: uuidv4(),
-      name: data.companyName,
-      taxId: data.taxId,
-      address: {
-        street: data.street,
-        number: data.number,
-        city: data.city,
-        zip: data.zip,
-        country: data.country
-      },
+      name: data.projectName,
       hourlyRate: [
         {
           rate: parseFloat(data.hourlyRate),
@@ -140,8 +75,8 @@ export const AddProjectPage: React.FC = () => {
         }
       ]
     }
-    addClient(client)
-    navigate('/data/clients')
+    addProject(clientId, project)
+    navigate('/data/projects')
   }
 
   return (
@@ -150,33 +85,23 @@ export const AddProjectPage: React.FC = () => {
         <BreadcrumbList>
           <BreadcrumbItem onClick={() => navigate('/data')}>Data</BreadcrumbItem>
           <BreadcrumbSeparator />
-          <BreadcrumbItem onClick={() => navigate('/data/clients')}>View Clients</BreadcrumbItem>
+          <BreadcrumbItem onClick={() => navigate('/data/projects')}>View Projects</BreadcrumbItem>
           <BreadcrumbSeparator />
-          <BreadcrumbItem variant="active">Add Client</BreadcrumbItem>
+          <BreadcrumbItem variant="active">Add Project</BreadcrumbItem>
         </BreadcrumbList>
-        <Button form="add-client" variant="default">
+        <Button form="add-project" variant="default">
           Submit
         </Button>
       </Breadcrumb>
 
       <Form {...form}>
-        <form id="add-client" className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+        <form id="add-project" className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
           {formFields.map((formField) => (
             <FormField
               key={formField.name}
               control={form.control}
               // as the type of formFields.name
-              name={
-                formField.name as
-                  | 'number'
-                  | 'companyName'
-                  | 'taxId'
-                  | 'street'
-                  | 'city'
-                  | 'zip'
-                  | 'country'
-                  | 'hourlyRate'
-              }
+              name={formField.name as 'projectName' | 'hourlyRate'}
               render={({ field }) => (
                 <FormItem>
                   <div className="flex flex-row justify-between items-center mb-3 ">

@@ -15,9 +15,10 @@ export interface Company {
   }
 }
 
-interface Project {
+export interface Project {
+  id: string
   name: string
-  hourlyRate?: HourlyRate[]
+  hourlyRate: HourlyRate[]
   additionalFields?: {
     [key: string]: string
   }

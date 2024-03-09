@@ -1,3 +1,4 @@
+import { ComboBox } from '@renderer/components/atoms/combo-box/combo-box.component'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -17,12 +18,17 @@ import {
 import { MainLayout } from '@renderer/components/main.layout.component'
 import useDataStore from '@renderer/store/data.store'
 import { EditIcon, PlusIcon, Trash2Icon } from 'lucide-react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 export const ProjectsPage: React.FC = () => {
   const navigate = useNavigate()
 
-  const { clients } = useDataStore((state) => state)
+  const { clients, removeProject } = useDataStore((state) => state)
+
+  const [clientId, setClientId] = useState<string>('')
+
+  const projects = clients.find((client) => client.id === clientId)?.projects || []
 
   return (
     <MainLayout>
@@ -32,49 +38,61 @@ export const ProjectsPage: React.FC = () => {
           <BreadcrumbSeparator />
           <BreadcrumbItem variant="active">View Projects</BreadcrumbItem>
         </BreadcrumbList>
-        <Button onClick={() => navigate('/data/projects/add')} variant="default" size="default">
+        <Button
+          disabled={!clientId}
+          onClick={() => navigate(`/data/projects/${clientId}/add`)}
+          variant="default"
+          size="default"
+        >
           <PlusIcon className="size-4" />
           Add Project
         </Button>
       </Breadcrumb>
-      <Table>
-        <TableCaption>A list of your projects.</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">Name</TableHead>
-            <TableHead>Tax ID</TableHead>
-            <TableHead>Address</TableHead>
-            <TableHead>Hourly Rate</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {clients.map((client) => (
-            <TableRow key={client.id}>
-              <TableCell className="font-medium">{client.name}</TableCell>
-              <TableCell>{client.taxId}</TableCell>
-              <TableCell>
-                {client.address.street} {client.address.number}, {client.address.zip}{' '}
-                {client.address.city}, {client.address.country}
-              </TableCell>
-              <TableCell>{client.hourlyRate[0].rate}</TableCell>
-              <TableCell className="text-right">
-                <Button
-                  onClick={() => {
-                    navigate(`/data/clients/${client.id}/edit`)
-                  }}
-                  variant="ghost"
-                >
-                  <EditIcon />
-                </Button>
-                <Button onClick={() => {}} variant="ghost">
-                  <Trash2Icon />
-                </Button>
-              </TableCell>
+
+      <ComboBox
+        onValueChange={setClientId}
+        searchPlaceholder="Search clients..."
+        selectPlaceholder="Select clients..."
+        noResultsText="No clients found."
+        items={clients.map((client) => ({ value: client.id, label: client.name }))}
+      />
+
+      {clientId && (
+        <Table>
+          <TableCaption>A list of your projects.</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Name</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {projects.map((project) => (
+              <TableRow key={project.id}>
+                <TableCell className="font-medium">{project.name}</TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    onClick={() => {
+                      navigate(`/data/projects/${clientId}/${project.id}/edit`)
+                    }}
+                    variant="ghost"
+                  >
+                    <EditIcon />
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      removeProject(clientId, project.id)
+                    }}
+                    variant="ghost"
+                  >
+                    <Trash2Icon />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </MainLayout>
   )
 }
