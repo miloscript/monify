@@ -10,6 +10,8 @@ import { ClientsPage } from './pages/data/clients/clients.data.page'
 import { EditClientPage } from './pages/data/clients/edit-client.data.page'
 import { CompaniesPage } from './pages/data/companies/companies.data.page'
 import { DataPage } from './pages/data/data.page'
+import { AddProjectPage } from './pages/data/projects/add-project.data.page'
+import { EditProjectPage } from './pages/data/projects/edit-project.data.page'
 import { ProjectsPage } from './pages/data/projects/projects.data.page'
 import { ExpensesPage } from './pages/expenses.page'
 import { InvoicesPage } from './pages/invoices.page'
@@ -46,6 +48,14 @@ const router = createHashRouter([
   {
     path: '/data/projects',
     element: <ProjectsPage />
+  },
+  {
+    path: '/data/projects/add',
+    element: <AddProjectPage />
+  },
+  {
+    path: '/data/projects/:id/edit',
+    element: <EditProjectPage />
   },
   {
     path: '*',
