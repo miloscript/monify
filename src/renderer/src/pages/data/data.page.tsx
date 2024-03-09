@@ -18,8 +18,8 @@ export const DataPage: React.FC = () => {
         <Link to="/data/projects">
           <Typography element="p">Projects</Typography>
         </Link>
-        <Link to="/data/user">
-          <Typography element="p">User</Typography>
+        <Link to="/data/settings">
+          <Typography element="p">Settings</Typography>
         </Link>
       </div>
     </MainLayout>

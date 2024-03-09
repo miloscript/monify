@@ -21,7 +21,14 @@ const initialState: DataState = {
       phone: ''
     }
   },
-  clients: []
+  clients: [],
+  app: {
+    config: {
+      project: {
+        additionalFields: []
+      }
+    }
+  }
 }
 
 // Custom storage object
@@ -47,6 +54,9 @@ type DataAction = {
   addProject(clientId: string, project: Project): void
   editProject(clientId: string, project: Project): void
   removeProject(clientId: string, projectId: string): void
+
+  addAdditionalField(field: string): void
+  removeAdditionalField(field: string): void
 }
 
 const useDataStore = create<DataState & DataAction>()(
@@ -105,6 +115,28 @@ const useDataStore = create<DataState & DataAction>()(
       removeClient: (clientId) =>
         set((state) => ({
           clients: state.clients.filter((client) => client.id !== clientId)
+        })),
+      addAdditionalField: (field) =>
+        set((state) => ({
+          app: {
+            config: {
+              project: {
+                additionalFields: [...state.app.config.project.additionalFields, field]
+              }
+            }
+          }
+        })),
+      removeAdditionalField: (field) =>
+        set((state) => ({
+          app: {
+            config: {
+              project: {
+                additionalFields: state.app.config.project.additionalFields.filter(
+                  (f) => f !== field
+                )
+              }
+            }
+          }
         }))
     }),
     {

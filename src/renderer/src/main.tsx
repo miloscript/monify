@@ -15,6 +15,7 @@ import { EditProjectPage } from './pages/data/projects/edit-project.data.page'
 import { ProjectsPage } from './pages/data/projects/projects.data.page'
 import { ExpensesPage } from './pages/expenses.page'
 import { InvoicesPage } from './pages/invoices.page'
+import { SettingsPage } from './pages/settings.page'
 
 const router = createHashRouter([
   {
@@ -56,6 +57,10 @@ const router = createHashRouter([
   {
     path: '/data/projects/:clientId/:id/edit',
     element: <EditProjectPage />
+  },
+  {
+    path: '/data/settings',
+    element: <SettingsPage />
   },
   {
     path: '*',

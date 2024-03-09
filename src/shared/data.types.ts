@@ -38,4 +38,11 @@ export interface Client extends Company {
 export interface DataState {
   company: Company
   clients: Client[]
+  app: {
+    config: {
+      project: {
+        additionalFields: string[]
+      }
+    }
+  }
 }
