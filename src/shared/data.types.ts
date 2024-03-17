@@ -36,11 +36,35 @@ export interface Client extends Company {
   hourlyRate: HourlyRate[]
 }
 
+export interface TransactionLabel {
+  id: string
+  name: string
+}
+
+export interface Transaction {
+  id: string
+  date: string
+  type: 'in' | 'out'
+  amount: number
+  description: string
+  label: TransactionLabel
+}
+
+export interface Account {
+  id: string
+  number: string
+  transactions: Transaction[]
+}
+
 export interface DataState {
   company: Company
   clients: Client[]
+  accounts: Account[]
   app: {
     config: {
+      transaction: {
+        labels: TransactionLabel[]
+      }
       project: {
         additionalFields: string[]
       }

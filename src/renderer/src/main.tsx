@@ -14,6 +14,8 @@ import { AddProjectPage } from './pages/data/projects/add-project.data.page'
 import { EditProjectPage } from './pages/data/projects/edit-project.data.page'
 import { ProjectsPage } from './pages/data/projects/projects.data.page'
 import { ExpensesPage } from './pages/expenses.page'
+import { ImportsPage } from './pages/expenses/imports.expenses.page'
+import { StatsPage } from './pages/expenses/stats.expenses.page'
 import { InvoicesPage } from './pages/invoices.page'
 import { SettingsPage } from './pages/settings.page'
 
@@ -25,6 +27,14 @@ const router = createHashRouter([
   {
     path: '/expenses',
     element: <ExpensesPage />
+  },
+  {
+    path: '/expenses/imports',
+    element: <ImportsPage />
+  },
+  {
+    path: '/expenses/stats',
+    element: <StatsPage />
   },
   {
     path: '/data',

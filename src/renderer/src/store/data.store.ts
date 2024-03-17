@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { StateStorage, createJSONStorage, persist } from 'zustand/middleware'
 
 import { getData, saveData } from '@renderer/api/main.api'
-import { DataState, Project } from '@shared/data.types'
+import { Account, DataState, Project, Transaction, TransactionLabel } from '@shared/data.types'
 
 const initialState: DataState = {
   company: {
@@ -21,9 +21,19 @@ const initialState: DataState = {
       phone: ''
     }
   },
+  accounts: [
+    {
+      id: '',
+      number: '',
+      transactions: []
+    }
+  ],
   clients: [],
   app: {
     config: {
+      transaction: {
+        labels: []
+      },
       project: {
         additionalFields: []
       }
@@ -57,6 +67,15 @@ type DataAction = {
 
   addAdditionalField(field: string): void
   removeAdditionalField(field: string): void
+
+  addLabel(label: { id: string; name: string }): void
+  removeLabel(labelId: string): void
+
+  addAccount(account: Account): void
+  addTransaction(accountId: string, transaction: Transaction): void
+  clearTransactions(accountId: string): void
+
+  editTransactionLabel(accountId: string, transactionId: string, label: TransactionLabel): void
 }
 
 const useDataStore = create<DataState & DataAction>()(
@@ -64,6 +83,50 @@ const useDataStore = create<DataState & DataAction>()(
     (set) => ({
       ...initialState,
       clients: [],
+
+      editTransactionLabel: (accountId, transactionId, label) =>
+        set((state) => ({
+          accounts: state.accounts.map((account) =>
+            account.id === accountId
+              ? {
+                  ...account,
+                  transactions: account.transactions.map((transaction) =>
+                    transaction.id === transactionId
+                      ? {
+                          ...transaction,
+                          label
+                        }
+                      : transaction
+                  )
+                }
+              : account
+          )
+        })),
+
+      addAccount: (account) =>
+        set((state) => ({
+          accounts: [...state.accounts, account]
+        })),
+
+      addTransaction: (accountId, transaction) =>
+        set((state) => ({
+          accounts: state.accounts.map((account) =>
+            account.id === accountId
+              ? {
+                  ...account,
+                  transactions: [...account.transactions, transaction]
+                }
+              : account
+          )
+        })),
+
+      clearTransactions: (accountId) =>
+        set((state) => ({
+          accounts: state.accounts.map((account) =>
+            account.id === accountId ? { ...account, transactions: [] } : account
+          )
+        })),
+
       setCompanyInfo: (payload) =>
         set((state) => ({
           company: {
@@ -120,6 +183,7 @@ const useDataStore = create<DataState & DataAction>()(
         set((state) => ({
           app: {
             config: {
+              ...state.app.config,
               project: {
                 additionalFields: [...state.app.config.project.additionalFields, field]
               }
@@ -130,10 +194,33 @@ const useDataStore = create<DataState & DataAction>()(
         set((state) => ({
           app: {
             config: {
+              ...state.app.config,
               project: {
                 additionalFields: state.app.config.project.additionalFields.filter(
                   (f) => f !== field
                 )
+              }
+            }
+          }
+        })),
+      addLabel: (label) =>
+        set((state) => ({
+          app: {
+            config: {
+              ...state.app.config,
+              transaction: {
+                labels: [...state.app.config.transaction.labels, label]
+              }
+            }
+          }
+        })),
+      removeLabel: (labelId) =>
+        set((state) => ({
+          app: {
+            config: {
+              ...state.app.config,
+              transaction: {
+                labels: state.app.config.transaction.labels.filter((l) => l.id !== labelId)
               }
             }
           }
