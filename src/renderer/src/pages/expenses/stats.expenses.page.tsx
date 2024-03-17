@@ -1,17 +1,8 @@
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbSeparator
-} from '@renderer/components/elements/breadcrumbs/breadcrumbs.component'
 import { MainLayout } from '@renderer/components/main.layout.component'
 import useDataStore from '@renderer/store/data.store'
-import { useNavigate } from 'react-router-dom'
 import { Cell, Pie, PieChart, Tooltip } from 'recharts'
 
 export const StatsPage: React.FC = () => {
-  const navigate = useNavigate()
-
   const { transactions } = useDataStore((state) => ({
     account: state.accounts[0],
     transactions: state.accounts[0].transactions
@@ -60,14 +51,12 @@ export const StatsPage: React.FC = () => {
   ]
 
   return (
-    <MainLayout>
-      <Breadcrumb className="flex flex-row justify-between">
-        <BreadcrumbList>
-          <BreadcrumbItem onClick={() => navigate('/expenses')}>Expenses</BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem variant="active">Stats</BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+    <MainLayout
+      crumbs={[
+        { name: 'Expenses', path: '/expenses' },
+        { name: 'Stats', path: '/expenses/stats' }
+      ]}
+    >
       <PieChart width={500} height={500}>
         <Pie
           dataKey="value"

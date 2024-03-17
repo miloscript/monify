@@ -7,12 +7,6 @@ import {
   FormItem,
   FormMessage
 } from '@renderer/components/atoms/form/form.component'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbSeparator
-} from '@renderer/components/elements/breadcrumbs/breadcrumbs.component'
 import { FormInput } from '@renderer/components/elements/form-input/form-input.component'
 import { FormLabel } from '@renderer/components/elements/form-label/form-label.component'
 import { MainLayout } from '@renderer/components/main.layout.component'
@@ -20,7 +14,6 @@ import useDataStore from '@renderer/store/data.store'
 import { DataState } from '@shared/data.types'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
 import * as z from 'zod'
 
 const formFields = [
@@ -121,7 +114,6 @@ const formSchema = z.object({
 })
 
 export const CompaniesPage: React.FC = () => {
-  const navigate = useNavigate()
   const { company, setCompanyInfo } = useDataStore((state) => state)
 
   const { watch, ...form } = useForm({
@@ -172,14 +164,12 @@ export const CompaniesPage: React.FC = () => {
   }, [form.handleSubmit, watch])
 
   return (
-    <MainLayout>
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem onClick={() => navigate('/data')}>Data</BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem variant="active">Edit company</BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+    <MainLayout
+      crumbs={[
+        { name: 'Data', path: '/data' },
+        { name: 'Edit company', path: '/data/companies' }
+      ]}
+    >
       <Form {...form} watch={watch}>
         <form className="space-y-4">
           {formFields.map((formField) => (

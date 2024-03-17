@@ -100,7 +100,12 @@ export const SettingsPage: React.FC = () => {
   }
 
   return (
-    <MainLayout>
+    <MainLayout
+      crumbs={[
+        { name: 'Data', path: '/data' },
+        { name: 'Settings', path: '/data/settings' }
+      ]}
+    >
       <Breadcrumb className="flex flex-row justify-between">
         <BreadcrumbList>
           <BreadcrumbItem onClick={() => navigate('/data')}>Data</BreadcrumbItem>

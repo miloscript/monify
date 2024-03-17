@@ -5,7 +5,7 @@ import useDataStore from '@renderer/store/data.store'
 export const InvoicesPage: React.FC = () => {
   const state = useDataStore((state) => state)
   return (
-    <MainLayout>
+    <MainLayout crumbs={[{ name: 'Invoices', path: '/' }]}>
       <Typography element="h3">Invoice config</Typography>
       {state.company.name && <Typography element="h3">{state.company.name}</Typography>}
     </MainLayout>

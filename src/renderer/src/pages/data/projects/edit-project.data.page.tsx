@@ -1,10 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbSeparator
-} from '@renderer/components/elements/breadcrumbs/breadcrumbs.component'
 import { Button } from '@renderer/components/elements/button/button.component'
 import { MainLayout } from '@renderer/components/main.layout.component'
 import useDataStore from '@renderer/store/data.store'
@@ -121,20 +115,16 @@ export const EditProjectPage: React.FC = () => {
   }
 
   return (
-    <MainLayout>
-      <Breadcrumb className="flex flex-row justify-between">
-        <BreadcrumbList>
-          <BreadcrumbItem onClick={() => navigate('/data')}>Data</BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem onClick={() => navigate('/data/projects')}>View Projects</BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem variant="active">Add Project</BreadcrumbItem>
-        </BreadcrumbList>
-        <Button form="add-project" variant="default">
-          Submit
-        </Button>
-      </Breadcrumb>
-
+    <MainLayout
+      crumbs={[
+        { name: 'Data', path: '/data' },
+        { name: 'View Projects', path: '/data/projects' },
+        { name: 'Edit Project', path: `/data/projects/${clientId}/${id}/edit` }
+      ]}
+    >
+      <Button form="add-project" variant="default">
+        Submit
+      </Button>
       <Form {...form}>
         <form id="add-project" className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
           {generateFormFields(additionalFields).map((formField) => (

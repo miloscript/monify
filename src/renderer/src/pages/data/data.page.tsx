@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 
 export const DataPage: React.FC = () => {
   return (
-    <MainLayout>
+    <MainLayout crumbs={[{ name: 'Data', path: '/data' }]}>
       <Typography element="h3" className="mb-4">
         Data
       </Typography>

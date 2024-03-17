@@ -1,11 +1,5 @@
 import transactionsHtml from '@renderer/_data/transactions.mock.html?raw'
 import { ComboBox } from '@renderer/components/atoms/combo-box/combo-box.component'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbSeparator
-} from '@renderer/components/elements/breadcrumbs/breadcrumbs.component'
 import { Button } from '@renderer/components/elements/button/button.component'
 import {
   Table,
@@ -22,7 +16,6 @@ import { Transaction } from '@shared/data.types'
 import isEqual from 'lodash.isequal'
 import { parse } from 'node-html-parser'
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 
 const parseTransactions = () => {
@@ -74,7 +67,6 @@ const sortTransactions = (transactions: Transaction[]) => {
 }
 
 export const ImportsPage: React.FC = () => {
-  const navigate = useNavigate()
   const { addTransaction, editTransactionLabel, clearTransactions } = useDataStore((state) => state)
   const { accounts } = useDataStore((state) => state)
   const { labels } = useDataStore((state) => state.app.config.transaction)
@@ -121,14 +113,12 @@ export const ImportsPage: React.FC = () => {
   }
 
   return (
-    <MainLayout>
-      <Breadcrumb className="flex flex-row justify-between">
-        <BreadcrumbList>
-          <BreadcrumbItem onClick={() => navigate('/expenses')}>Expenses</BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem variant="active">Imports</BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+    <MainLayout
+      crumbs={[
+        { name: 'Expenses', path: '/expenses' },
+        { name: 'Imports', path: '/expenses/imports' }
+      ]}
+    >
       <div>
         <Button onClick={onImport} variant="default" size="default">
           Trigger import

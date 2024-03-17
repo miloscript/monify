@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 
 export const ExpensesPage: React.FC = () => {
   return (
-    <MainLayout>
+    <MainLayout crumbs={[{ name: 'Expenses', path: '/expenses' }]}>
       <Typography element="h3" className="mb-4">
         Expenses
       </Typography>

@@ -1,9 +1,3 @@
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbSeparator
-} from '@renderer/components/elements/breadcrumbs/breadcrumbs.component'
 import { Button } from '@renderer/components/elements/button/button.component'
 import {
   Table,
@@ -28,18 +22,16 @@ export const ClientsPage: React.FC = () => {
   }
 
   return (
-    <MainLayout>
-      <Breadcrumb className="flex flex-row justify-between">
-        <BreadcrumbList>
-          <BreadcrumbItem onClick={() => navigate('/data')}>Data</BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem variant="active">View Clients</BreadcrumbItem>
-        </BreadcrumbList>
-        <Button onClick={() => navigate('/data/clients/add')} variant="default" size="default">
-          <PlusIcon className="size-4" />
-          Add Client
-        </Button>
-      </Breadcrumb>
+    <MainLayout
+      crumbs={[
+        { name: 'Data', path: '/data' },
+        { name: 'Clients', path: '/data/clients' }
+      ]}
+    >
+      <Button onClick={() => navigate('/data/clients/add')} variant="default" size="default">
+        <PlusIcon className="size-4" />
+        Add Client
+      </Button>
       <Table>
         <TableCaption>A list of your clients.</TableCaption>
         <TableHeader>

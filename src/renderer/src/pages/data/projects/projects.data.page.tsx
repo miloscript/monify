@@ -1,10 +1,4 @@
 import { ComboBox } from '@renderer/components/atoms/combo-box/combo-box.component'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbSeparator
-} from '@renderer/components/elements/breadcrumbs/breadcrumbs.component'
 import { Button } from '@renderer/components/elements/button/button.component'
 import {
   Table,
@@ -31,24 +25,21 @@ export const ProjectsPage: React.FC = () => {
   const projects = clients.find((client) => client.id === clientId)?.projects || []
 
   return (
-    <MainLayout>
-      <Breadcrumb className="flex flex-row justify-between">
-        <BreadcrumbList>
-          <BreadcrumbItem onClick={() => navigate('/data')}>Data</BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem variant="active">View Projects</BreadcrumbItem>
-        </BreadcrumbList>
-        <Button
-          disabled={!clientId}
-          onClick={() => navigate(`/data/projects/${clientId}/add`)}
-          variant="default"
-          size="default"
-        >
-          <PlusIcon className="size-4" />
-          Add Project
-        </Button>
-      </Breadcrumb>
-
+    <MainLayout
+      crumbs={[
+        { name: 'Data', path: '/data' },
+        { name: 'View Projects', path: '/data/projects' }
+      ]}
+    >
+      <Button
+        disabled={!clientId}
+        onClick={() => navigate(`/data/projects/${clientId}/add`)}
+        variant="default"
+        size="default"
+      >
+        <PlusIcon className="size-4" />
+        Add Project
+      </Button>
       <ComboBox
         onValueChange={setClientId}
         searchPlaceholder="Search clients..."

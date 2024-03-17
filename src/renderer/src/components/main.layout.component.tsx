@@ -1,63 +1,102 @@
 import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList
-} from '@renderer/components/elements/navigation-menu/navigation-menu.component'
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@renderer/components/elements/crumbs/crumbs.component'
 import { cn } from '@renderer/lib/utils'
+import { ArrowLeftFromLineIcon, BanknoteIcon, DatabaseIcon, FileIcon } from 'lucide-react'
 
 import { Link, useLocation } from 'react-router-dom'
 
 interface Props {
+  crumbs?: {
+    name: string
+    path: string
+  }[]
   children: React.ReactNode
 }
 
-const headerConfig = [
-  {
-    name: 'Invoices',
-    path: '/'
-  },
-  {
-    name: 'Expenses',
-    path: '/expenses'
-  },
-  {
-    name: 'Data',
-    path: '/data'
-  }
-]
-
-export const MainLayout = ({ children }: Props): JSX.Element => {
+export const MainLayout = ({ children, crumbs }: Props): JSX.Element => {
   const location = useLocation()
   const isActive = (path: string) => {
     if (path === '/') return location.pathname === path
     return location.pathname.startsWith(path)
   }
+
   return (
-    <div>
-      <header className="flex flex-row justify-between px-6 py-4 border-b">
-        <NavigationMenuItem className="hover:bg-accent px-4 py-1 rounded">
-          <p>monify.finance</p>
-        </NavigationMenuItem>
-        <NavigationMenu className="justify-end">
-          <NavigationMenuList className="gap-x-1">
-            {headerConfig.map((item, index) => (
-              <NavigationMenuItem key={index}>
-                <NavigationMenuLink
-                  className={cn(
-                    'hover:bg-accent px-4 py-1 rounded',
-                    isActive(item.path) && 'bg-accent'
-                  )}
-                  asChild
-                >
-                  <Link to={item.path}>{item.name}</Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            ))}
-          </NavigationMenuList>
-        </NavigationMenu>
+    <div className="flex flex-row">
+      <header className="w-[240px] border-r h-[100vh] flex flex-col fixed">
+        <div className="border-b flex justify-end items-center px-2 h-[36px] mb-0.5">
+          <button className="hover:bg-accent cursor-pointer rounded size-6 flex justify-center items-center">
+            <ArrowLeftFromLineIcon className="size-4" />
+          </button>
+        </div>
+        <nav>
+          <Link
+            to="/"
+            className={cn(
+              'text-sm font-medium flex flex-row justify-start items-center px-2.5 my-1 mx-0.5 h-[26px] hover:bg-accent',
+              isActive('/') && 'bg-accent font-semibold'
+            )}
+          >
+            <FileIcon className="w-4 h-5 mr-2" />
+            Invoices
+          </Link>
+          <Link
+            to="/expenses"
+            className={cn(
+              'text-sm font-medium flex flex-row justify-start items-center px-2.5 my-1 mx-0.5 h-[26px] hover:bg-accent',
+              isActive('/expenses') && 'bg-accent font-semibold'
+            )}
+          >
+            <BanknoteIcon className="w-4 h-5 mr-2" />
+            Expenses
+          </Link>
+          <div>
+            <Link
+              to="/data"
+              className={cn(
+                'text-sm font-medium flex flex-row justify-start items-center px-2.5 my-1 mx-0.5 h-[26px] hover:bg-accent',
+                isActive('/data') && 'bg-accent font-semibold'
+              )}
+            >
+              <DatabaseIcon className="w-4 h-5 mr-2" />
+              Data
+            </Link>
+          </div>
+        </nav>
       </header>
-      <div className="px-8 py-2">{children}</div>
+      <div className="flex flex-col flex-1 ml-[240px]">
+        <header className="flex flex-row justify-start items-center border-b h-[36px] fixed w-full bg-white z-10 pl-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              {crumbs &&
+                crumbs.map((crumb, index) => {
+                  const isActive = location.pathname === crumb.path
+                  return (
+                    <BreadcrumbList
+                      className="flex flex-row justify-center items-center"
+                      key={index}
+                    >
+                      <BreadcrumbItem>
+                        {isActive ? (
+                          <BreadcrumbPage>{crumb.name}</BreadcrumbPage>
+                        ) : (
+                          <BreadcrumbLink href={crumb.path}>{crumb.name}</BreadcrumbLink>
+                        )}
+                      </BreadcrumbItem>
+                      {index < crumbs.length - 1 && <BreadcrumbSeparator key={index} />}
+                    </BreadcrumbList>
+                  )
+                })}
+            </BreadcrumbList>
+          </Breadcrumb>
+        </header>
+        <div className="px-4 py-2 flex-1 mt-[36px]">{children}</div>
+      </div>
     </div>
   )
 }
