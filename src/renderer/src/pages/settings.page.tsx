@@ -6,12 +6,6 @@ import {
   FormItem,
   FormMessage
 } from '@renderer/components/atoms/form/form.component'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbSeparator
-} from '@renderer/components/elements/breadcrumbs/breadcrumbs.component'
 import { Button } from '@renderer/components/elements/button/button.component'
 import { FormInput } from '@renderer/components/elements/form-input/form-input.component'
 import { FormLabel } from '@renderer/components/elements/form-label/form-label.component'
@@ -28,7 +22,6 @@ import { MainLayout } from '@renderer/components/main.layout.component'
 import useDataStore from '@renderer/store/data.store'
 import { Trash2Icon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 import * as z from 'zod'
 
@@ -65,7 +58,6 @@ const labelFields = [
 ]
 
 export const SettingsPage: React.FC = () => {
-  const navigate = useNavigate()
   const { addAdditionalField, addLabel, removeAdditionalField, removeLabel, app } = useDataStore(
     (state) => state
   )
@@ -106,16 +98,9 @@ export const SettingsPage: React.FC = () => {
         { name: 'Settings', path: '/data/settings' }
       ]}
     >
-      <Breadcrumb className="flex flex-row justify-between">
-        <BreadcrumbList>
-          <BreadcrumbItem onClick={() => navigate('/data')}>Data</BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem variant="active">Settings</BreadcrumbItem>
-        </BreadcrumbList>
-        <Button form="add-form-field" variant="default">
-          Submit
-        </Button>
-      </Breadcrumb>
+      <Button form="add-form-field" variant="default">
+        Submit
+      </Button>
       <Form {...form}>
         <form id="add-form-field" className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
           {formFields.map((formField) => (

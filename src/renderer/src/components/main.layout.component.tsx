@@ -6,8 +6,11 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from '@renderer/components/elements/crumbs/crumbs.component'
+import { ScrollArea } from '@renderer/components/elements/scroll-area/scroll-area.component'
+import { useDimensions } from '@renderer/hooks/use-dimensions.hook'
 import { cn } from '@renderer/lib/utils'
 import { ArrowLeftFromLineIcon, BanknoteIcon, DatabaseIcon, FileIcon } from 'lucide-react'
+import { useMemo } from 'react'
 
 import { Link, useLocation } from 'react-router-dom'
 
@@ -21,6 +24,10 @@ interface Props {
 
 export const MainLayout = ({ children, crumbs }: Props): JSX.Element => {
   const location = useLocation()
+  const { height: windowHeight } = useDimensions()
+
+  const mainAreaHeight = useMemo(() => windowHeight - 36, [windowHeight])
+
   const isActive = (path: string) => {
     if (path === '/') return location.pathname === path
     return location.pathname.startsWith(path)
@@ -95,7 +102,14 @@ export const MainLayout = ({ children, crumbs }: Props): JSX.Element => {
             </BreadcrumbList>
           </Breadcrumb>
         </header>
-        <div className="px-4 py-2 flex-1 mt-[36px]">{children}</div>
+        <ScrollArea
+          className="mt-[36px]"
+          style={{
+            height: `${mainAreaHeight}px`
+          }}
+        >
+          <div className="px-4 py-2">{children}</div>
+        </ScrollArea>
       </div>
     </div>
   )
