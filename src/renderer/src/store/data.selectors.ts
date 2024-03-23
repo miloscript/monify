@@ -8,3 +8,7 @@ export const getProjectById = (state: DataState, clientId: string, projectId: st
   const client = getClientById(state, clientId)
   return client?.projects?.find((project) => project.id === projectId)
 }
+
+export const getInvoiceById = (state: DataState, invoiceId: string) => {
+  return state.invoices.find((invoice) => invoice.id === invoiceId)
+}

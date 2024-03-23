@@ -2,7 +2,14 @@ import { create } from 'zustand'
 import { StateStorage, createJSONStorage, persist } from 'zustand/middleware'
 
 import { getData, saveData } from '@renderer/api/main.api'
-import { Account, DataState, Project, Transaction, TransactionLabel } from '@shared/data.types'
+import {
+  Account,
+  DataState,
+  Invoice,
+  Project,
+  Transaction,
+  TransactionLabel
+} from '@shared/data.types'
 
 const initialState: DataState = {
   company: {
@@ -29,6 +36,7 @@ const initialState: DataState = {
     }
   ],
   clients: [],
+  invoices: [],
   app: {
     config: {
       transaction: {
@@ -76,6 +84,10 @@ type DataAction = {
   clearTransactions(accountId: string): void
 
   editTransactionLabel(accountId: string, transactionId: string, label: TransactionLabel): void
+
+  addInvoice(invoice: Invoice): void
+  editInvoice(invoice: Invoice): void
+  removeInvoice(invoiceId: string): void
 }
 
 const useDataStore = create<DataState & DataAction>()(
@@ -83,6 +95,19 @@ const useDataStore = create<DataState & DataAction>()(
     (set) => ({
       ...initialState,
       clients: [],
+
+      addInvoice: (invoice) =>
+        set((state) => ({
+          invoices: [...state.invoices, invoice]
+        })),
+      editInvoice: (invoice) =>
+        set((state) => ({
+          invoices: state.invoices.map((i) => (i.id === invoice.id ? invoice : i))
+        })),
+      removeInvoice: (invoiceId) =>
+        set((state) => ({
+          invoices: state.invoices.filter((invoice) => invoice.id !== invoiceId)
+        })),
 
       editTransactionLabel: (accountId, transactionId, label) =>
         set((state) => ({

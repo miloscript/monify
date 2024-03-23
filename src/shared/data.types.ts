@@ -56,7 +56,23 @@ export interface Account {
   transactions: Transaction[]
 }
 
+export interface InvoiceProject extends Project {
+  hours: number
+}
+
+export interface Invoice {
+  id: string
+  createdAt: string
+  date: string
+  number: string
+  performancePeriod: string
+  from: Company
+  to: Client
+  items: InvoiceProject[]
+}
+
 export interface DataState {
+  invoices: Invoice[]
   company: Company
   clients: Client[]
   accounts: Account[]

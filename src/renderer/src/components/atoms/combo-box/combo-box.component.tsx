@@ -21,6 +21,7 @@ export interface ComboBoxItem {
 }
 
 interface ComboBoxProps {
+  value?: string
   onValueChange: (value: string) => void
   selectPlaceholder: string
   searchPlaceholder: string
@@ -29,6 +30,7 @@ interface ComboBoxProps {
 }
 
 export const ComboBox = ({
+  value: initialValue,
   selectPlaceholder,
   searchPlaceholder,
   noResultsText,
@@ -36,7 +38,8 @@ export const ComboBox = ({
   items
 }: ComboBoxProps) => {
   const [open, setOpen] = React.useState(false)
-  const [value, setValue] = React.useState('')
+  // check if the value is in the items and set it
+  const [value, setValue] = React.useState(initialValue)
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
