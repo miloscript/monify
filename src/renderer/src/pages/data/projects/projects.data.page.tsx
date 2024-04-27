@@ -1,3 +1,4 @@
+import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import { ComboBox } from '@renderer/components/atoms/combo-box/combo-box.component'
 import { Button } from '@renderer/components/elements/button/button.component'
 import {
@@ -9,7 +10,6 @@ import {
   TableHeader,
   TableRow
 } from '@renderer/components/elements/table/table.component'
-import { MainLayout } from '@renderer/components/main.layout.component'
 import useDataStore from '@renderer/store/data.store'
 import { EditIcon, PlusIcon, Trash2Icon } from 'lucide-react'
 import { useState } from 'react'

@@ -1,3 +1,4 @@
+import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import { Button } from '@renderer/components/elements/button/button.component'
 import {
   Table,
@@ -8,7 +9,6 @@ import {
   TableHeader,
   TableRow
 } from '@renderer/components/elements/table/table.component'
-import { MainLayout } from '@renderer/components/main.layout.component'
 import useDataStore from '@renderer/store/data.store'
 import { Edit, PlusIcon, Trash2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'

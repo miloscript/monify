@@ -1,4 +1,5 @@
 import transactionsHtml from '@renderer/_data/transactions.mock.html?raw'
+import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import { ComboBox } from '@renderer/components/atoms/combo-box/combo-box.component'
 import { Button } from '@renderer/components/elements/button/button.component'
 import {
@@ -10,7 +11,6 @@ import {
   TableHeader,
   TableRow
 } from '@renderer/components/elements/table/table.component'
-import { MainLayout } from '@renderer/components/main.layout.component'
 import useDataStore from '@renderer/store/data.store'
 import { Transaction } from '@shared/data.types'
 import isEqual from 'lodash.isequal'

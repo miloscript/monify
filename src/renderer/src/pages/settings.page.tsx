@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import {
   Form,
   FormControl,
@@ -18,7 +19,6 @@ import {
   TableHeader,
   TableRow
 } from '@renderer/components/elements/table/table.component'
-import { MainLayout } from '@renderer/components/main.layout.component'
 import useDataStore from '@renderer/store/data.store'
 import { Trash2Icon } from 'lucide-react'
 import { useForm } from 'react-hook-form'

@@ -4,7 +4,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createHashRouter, RouterProvider } from 'react-router-dom'
 
-import { MainLayout } from './components/main.layout.component'
+import { MainLayout } from './components/_layouts/main.layout.component'
 import { AddClientPage } from './pages/data/clients/add-client.data.page'
 import { ClientsPage } from './pages/data/clients/clients.data.page'
 import { EditClientPage } from './pages/data/clients/edit-client.data.page'

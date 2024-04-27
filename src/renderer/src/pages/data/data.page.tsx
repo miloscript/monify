@@ -1,5 +1,5 @@
+import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import { Typography } from '@renderer/components/elements/typography/typography.component'
-import { MainLayout } from '@renderer/components/main.layout.component'
 import { Link } from 'react-router-dom'
 
 export const DataPage: React.FC = () => {

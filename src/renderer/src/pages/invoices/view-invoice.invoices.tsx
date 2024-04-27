@@ -1,4 +1,4 @@
-import { MainLayout } from '@renderer/components/main.layout.component'
+import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 
 import { Document, Font, PDFViewer, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 import { ReactNode } from 'react'

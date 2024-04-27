@@ -1,4 +1,4 @@
-import { MainLayout } from '@renderer/components/main.layout.component'
+import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import useDataStore from '@renderer/store/data.store'
 import { Cell, Pie, PieChart, Tooltip } from 'recharts'
 

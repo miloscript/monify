@@ -1,5 +1,5 @@
+import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import { Button } from '@renderer/components/elements/button/button.component'
-import { MainLayout } from '@renderer/components/main.layout.component'
 
 import { ComboBox, ComboBoxItem } from '@renderer/components/atoms/combo-box/combo-box.component'
 import {

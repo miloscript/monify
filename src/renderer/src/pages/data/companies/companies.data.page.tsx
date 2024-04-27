@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { zodResolver } from '@hookform/resolvers/zod'
+import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import {
   Form,
   FormControl,
@@ -9,7 +10,6 @@ import {
 } from '@renderer/components/atoms/form/form.component'
 import { FormInput } from '@renderer/components/elements/form-input/form-input.component'
 import { FormLabel } from '@renderer/components/elements/form-label/form-label.component'
-import { MainLayout } from '@renderer/components/main.layout.component'
 import useDataStore from '@renderer/store/data.store'
 import { DataState } from '@shared/data.types'
 import { useEffect } from 'react'
