@@ -54,7 +54,7 @@ export const AddProjectPage: React.FC = () => {
       projectName: z
         .string()
         .transform((value) => value.trim())
-        .pipe(z.string().min(4, '123')),
+        .pipe(z.string().min(3, '123')),
       hourlyRate: z.string().refine((val) => !Number.isNaN(parseInt(val, 10)), {
         message: 'Expected number, received a string'
       })
@@ -63,7 +63,7 @@ export const AddProjectPage: React.FC = () => {
       schema[field] = z
         .string()
         .transform((value) => value.trim())
-        .pipe(z.string().min(4, '123'))
+        .pipe(z.string().min(3, '123'))
     })
     return z.object(schema)
   }

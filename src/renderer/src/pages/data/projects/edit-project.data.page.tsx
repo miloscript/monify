@@ -68,7 +68,7 @@ export const EditProjectPage: React.FC = () => {
       projectName: z
         .string()
         .transform((value) => value.trim().toString())
-        .pipe(z.string().min(4, '123')),
+        .pipe(z.string().min(3, '123')),
       hourlyRate: z
         .string()
         .transform((value) => value.toString())

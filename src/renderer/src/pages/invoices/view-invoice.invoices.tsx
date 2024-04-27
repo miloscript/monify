@@ -64,7 +64,7 @@ export const ViewInvoicePage: React.FC = () => {
         { name: 'Edit invoice', path: '/invoices/edit' }
       ]}
     >
-      <PDFViewer showToolbar={false} width={'100%'} height={'600px'}>
+      <PDFViewer showToolbar={true} width={'100%'} height={'600px'}>
         <Document style={styles.document} pageMode="fullScreen">
           <Page size="A4" style={styles.page}>
             <View style={{ marginBottom: '16px' }}>
@@ -87,7 +87,7 @@ export const ViewInvoicePage: React.FC = () => {
                 <RegularText>
                   {`${invoice?.to.address.zip} ${invoice?.to.address.city}, ${invoice?.to.address.country}`}
                 </RegularText>
-                <RegularText>VAT-ID: 143 / 164 / 10880</RegularText>
+                <RegularText>Tax number: {invoice?.to.taxId}</RegularText>
               </View>
               <View style={{ width: '100%' }}>
                 <RegularText>
@@ -101,7 +101,7 @@ export const ViewInvoicePage: React.FC = () => {
                   {`${invoice?.from.address.zip} ${invoice?.from.address.city}, ${invoice?.from.address.country}`}
                 </RegularText>
                 <RegularText>
-                  TAX-ID:
+                  Tax number:
                   {invoice?.from.taxId}
                 </RegularText>
               </View>
@@ -236,7 +236,7 @@ export const ViewInvoicePage: React.FC = () => {
                           textAlign: 'right'
                         }}
                       >
-                        {`€${item.hourlyRate[0].rate * item.hours}`}
+                        {`€${(item.hourlyRate[0].rate * item.hours).toFixed(2)}`}
                       </RegularText>
                     </View>
                   )
@@ -273,7 +273,8 @@ export const ViewInvoicePage: React.FC = () => {
                   style={{
                     minWidth: '15%',
                     textAlign: 'right',
-                    padding: '4px 8px'
+                    padding: '4px 8px',
+                    fontWeight: 'bold'
                   }}
                 >
                   {/* subtotal of all hours, im getting a string value 01520, fix it */}
@@ -288,7 +289,8 @@ export const ViewInvoicePage: React.FC = () => {
                   style={{
                     minWidth: '20%',
                     textAlign: 'right',
-                    padding: '4px 8px'
+                    padding: '4px 8px',
+                    fontWeight: 'bold'
                   }}
                 >
                   €
@@ -298,68 +300,6 @@ export const ViewInvoicePage: React.FC = () => {
                   )}
                 </RegularText>
               </View>
-              {/* <View style={{ ...styles.row }}>
-                <RegularText
-                  style={{
-                    width: '65%',
-                    textAlign: 'right'
-                  }}
-                >
-                  {' '}
-                </RegularText>
-                <RegularText
-                  style={{
-                    minWidth: '15%',
-                    textAlign: 'right',
-                    padding: '4px 8px'
-                  }}
-                >
-                  Tax (0%)
-                </RegularText>
-                <RegularText
-                  style={{
-                    minWidth: '20%',
-                    textAlign: 'right',
-                    padding: '4px 8px'
-                  }}
-                >
-                  €0.00
-                </RegularText>
-              </View> */}
-              {/* <View style={{ ...styles.row, borderTop: '1px solid #ccc' }}>
-                <RegularText
-                  style={{
-                    width: '65%',
-                    textAlign: 'right'
-                  }}
-                >
-                  {' '}
-                </RegularText>
-                <RegularText
-                  style={{
-                    fontWeight: 'bold',
-                    minWidth: '80%',
-                    textAlign: 'left',
-                    padding: '4px 8px'
-                  }}
-                >
-                  Total
-                </RegularText>
-                <RegularText
-                  style={{
-                    fontWeight: 'bold',
-                    minWidth: '20%',
-                    textAlign: 'right',
-                    padding: '4px 8px'
-                  }}
-                >
-                  €
-                  {invoice?.items.reduce(
-                    (acc, item) => acc + item.hourlyRate[0].rate * item.hours,
-                    0
-                  )}
-                </RegularText>
-              </View> */}
             </View>
             <View
               style={{
