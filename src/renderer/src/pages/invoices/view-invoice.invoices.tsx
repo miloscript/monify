@@ -294,10 +294,9 @@ export const ViewInvoicePage: React.FC = () => {
                   }}
                 >
                   €
-                  {invoice?.items.reduce(
-                    (acc, item) => acc + item.hourlyRate[0].rate * item.hours,
-                    0
-                  )}
+                  {invoice?.items
+                    .reduce((acc, item) => acc + item.hourlyRate[0].rate * item.hours, 0)
+                    .toFixed(2)}
                 </RegularText>
               </View>
             </View>
