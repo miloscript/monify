@@ -21,6 +21,9 @@ export const DataPage: React.FC = () => {
         <Link to="/data/settings">
           <Typography element="p">Settings</Typography>
         </Link>
+        <Link to="/data/export">
+          <Typography element="p">Export</Typography>
+        </Link>
       </div>
     </MainLayout>
   )
