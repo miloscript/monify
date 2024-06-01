@@ -15,12 +15,10 @@ const config = {
     output: 'dist',
     buildResources: 'build'
   },
-  extraResources: ['build/icons/**'],
-  files: ['packages/**/dist/**'],
+  // extraResources: ['build/icons/**'],
+  // files: ['packages/**/dist/**'],
   extraMetadata: {
     version: process.env.VITE_APP_VERSION
-    // homepage: 'https://www.monify.app',
-    // description: 'An open source invoice app.'
   },
   mac: {
     icon: 'assets/icons/icon.icns',
