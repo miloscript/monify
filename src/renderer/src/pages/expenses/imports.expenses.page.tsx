@@ -1,4 +1,4 @@
-import transactionsHtml from '@renderer/_data/transactions.mock.html?raw'
+// import transactionsHtml from '@renderer/_data/transactions.mock.html?raw'
 import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import { ComboBox } from '@renderer/components/atoms/combo-box/combo-box.component'
 import { Button } from '@renderer/components/elements/button/button.component'
@@ -14,40 +14,40 @@ import {
 import useDataStore from '@renderer/store/data.store'
 import { Transaction } from '@shared/data.types'
 import isEqual from 'lodash.isequal'
-import { parse } from 'node-html-parser'
+// import { parse } from 'node-html-parser'
 import { useEffect, useState } from 'react'
-import { v4 as uuidv4 } from 'uuid'
+// import { v4 as uuidv4 } from 'uuid'
 
 const parseTransactions = () => {
   const transactions: Transaction[] = []
-  const root = parse(transactionsHtml)
-  const table = root.querySelectorAll('table > tbody > tr')
-  if (!table) return
-  for (let i = 0; i < table.length; i++) {
-    const element = table[i]
-    const parsed = parse(element.toString())
-    const tr = parsed.querySelector('td > table > tbody > tr')
-    if (!tr) continue
-    const td = tr.querySelectorAll('td')
+  // const root = parse(transactionsHtml)
+  // const table = root.querySelectorAll('table > tbody > tr')
+  // if (!table) return
+  // for (let i = 0; i < table.length; i++) {
+  //   const element = table[i]
+  //   const parsed = parse(element.toString())
+  //   const tr = parsed.querySelector('td > table > tbody > tr')
+  //   if (!tr) continue
+  //   const td = tr.querySelectorAll('td')
 
-    // const valueDate = td[0].textContent.trim()
-    const transactionDate = td[1].textContent.trim()
-    const payment = parseFloat(td[2].textContent.trim().replace('.', '').replace(',', '.')) || 0
-    const income = parseFloat(td[3].textContent.trim().replace('.', '').replace(',', '.')) || 0
-    const description = td[5].textContent.replace(/\s+/g, ' ').trim()
+  //   // const valueDate = td[0].textContent.trim()
+  //   const transactionDate = td[1].textContent.trim()
+  //   const payment = parseFloat(td[2].textContent.trim().replace('.', '').replace(',', '.')) || 0
+  //   const income = parseFloat(td[3].textContent.trim().replace('.', '').replace(',', '.')) || 0
+  //   const description = td[5].textContent.replace(/\s+/g, ' ').trim()
 
-    transactions.push({
-      id: uuidv4(),
-      date: transactionDate,
-      type: payment > 0 ? 'out' : 'in',
-      amount: payment > 0 ? payment : income,
-      description,
-      label: {
-        id: '',
-        name: ''
-      }
-    })
-  }
+  //   transactions.push({
+  //     id: uuidv4(),
+  //     date: transactionDate,
+  //     type: payment > 0 ? 'out' : 'in',
+  //     amount: payment > 0 ? payment : income,
+  //     description,
+  //     label: {
+  //       id: '',
+  //       name: ''
+  //     }
+  //   })
+  // }
 
   return transactions
 }
