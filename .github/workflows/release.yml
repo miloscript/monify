@@ -102,9 +102,16 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
+      - name: 'Generate token'
+        id: generate_token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.BOT_APP_ID }}
+          private_key: ${{ secrets.BOT_PRIVATE_KEY }}
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          token: ${{ steps.generate_token.outputs.token }}
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -130,6 +137,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm updateVersion
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
 
       - name: Write next version to meta.json
         run: echo "{\"version\":\"${{ needs.draft.outputs.version }}\"}" >| ./build/meta.json
