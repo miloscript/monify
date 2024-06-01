@@ -150,6 +150,7 @@ jobs:
         id: release-to-github
         env:
           VITE_APP_VERSION: ${{ needs.draft.outputs.version }}
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: pnpm release
 
       - name: Delete tag for failed release
