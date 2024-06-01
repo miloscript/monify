@@ -19,7 +19,10 @@
     "build:win": "npm run build && electron-builder --win",
     "build:mac": "electron-vite build && electron-builder --mac",
     "build:linux": "electron-vite build && electron-builder --linux",
-    "prepare": "husky"
+    "prepare": "husky",
+    "release": "electron-vite build && electron-builder --mac --publish always",
+    "updateVersion": "semantic-release",
+    "releaseNext": "electron-builder --config .electron-builder.config.js --publish always"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
@@ -57,6 +60,9 @@
     "@electron-toolkit/eslint-config-prettier": "^2.0.0",
     "@electron-toolkit/eslint-config-ts": "^1.0.1",
     "@electron-toolkit/tsconfig": "^1.0.1",
+    "@semantic-release/commit-analyzer": "^13.0.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/npm": "^12.0.1",
     "@types/node": "^18.19.9",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
@@ -72,6 +78,8 @@
     "prettier": "^3.2.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "semantic-release": "^24.0.0",
+    "semantic-release-export-data": "^1.0.1",
     "tailwind": "^4.0.0",
     "tailwindcss": "^3.4.1",
     "ts-node": "^10.9.2",
