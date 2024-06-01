@@ -8,66 +8,131 @@ import {
   FormItem,
   FormMessage
 } from '@renderer/components/atoms/form/form.component'
+import { Button } from '@renderer/components/elements/button/button.component'
 import { FormInput } from '@renderer/components/elements/form-input/form-input.component'
 import { FormLabel } from '@renderer/components/elements/form-label/form-label.component'
 import useDataStore from '@renderer/store/data.store'
 import { DataState } from '@shared/data.types'
+import { InfoIcon } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
-const formFields = [
+const formConfig = [
   {
-    name: 'companyName',
-    label: 'Company Name',
-    placeholder: 'Enter company name'
+    title: 'Company Information',
+    fields: [
+      {
+        name: 'companyName',
+        label: 'Company Name',
+        placeholder: 'Enter company name'
+      },
+      {
+        name: 'taxId',
+        label: 'Tax ID',
+        placeholder: 'Enter tax ID'
+      },
+      {
+        name: 'personName',
+        label: 'Name',
+        placeholder: 'Enter person name'
+      },
+      {
+        name: 'phone',
+        label: 'Phone',
+        placeholder: 'Enter phone'
+      },
+      {
+        name: 'email',
+        label: 'Email',
+        placeholder: 'Enter email'
+      }
+    ]
   },
   {
-    name: 'taxId',
-    label: 'Tax ID',
-    placeholder: 'Enter tax ID'
-  },
-  {
-    name: 'street',
-    label: 'Street',
-    placeholder: 'Enter street'
-  },
-  {
-    name: 'number',
-    label: 'Number',
-    placeholder: 'Enter number'
-  },
-  {
-    name: 'city',
-    label: 'City',
-    placeholder: 'Enter city'
-  },
-  {
-    name: 'zip',
-    label: 'Zip',
-    placeholder: 'Enter zip'
-  },
-  {
-    name: 'country',
-    label: 'Country',
-    placeholder: 'Enter country'
-  },
-  {
-    name: 'personName',
-    label: 'Name',
-    placeholder: 'Enter person name'
-  },
-  {
-    name: 'phone',
-    label: 'Phone',
-    placeholder: 'Enter phone'
-  },
-  {
-    name: 'email',
-    label: 'Email',
-    placeholder: 'Enter email'
+    title: 'Company Address',
+    fields: [
+      {
+        name: 'street',
+        label: 'Street',
+        placeholder: 'Enter street'
+      },
+      {
+        name: 'number',
+        label: 'Number',
+        placeholder: 'Enter number'
+      },
+      {
+        name: 'city',
+        label: 'City',
+        placeholder: 'Enter city'
+      },
+      {
+        name: 'zip',
+        label: 'Zip',
+        placeholder: 'Enter zip'
+      },
+      {
+        name: 'country',
+        label: 'Country',
+        placeholder: 'Enter country'
+      }
+    ]
   }
 ]
+
+// const formFields = [
+//   {
+//     name: 'companyName',
+//     label: 'Company Name',
+//     placeholder: 'Enter company name'
+//   },
+//   {
+//     name: 'taxId',
+//     label: 'Tax ID',
+//     placeholder: 'Enter tax ID'
+//   },
+//   {
+//     name: 'street',
+//     label: 'Street',
+//     placeholder: 'Enter street'
+//   },
+//   {
+//     name: 'number',
+//     label: 'Number',
+//     placeholder: 'Enter number'
+//   },
+//   {
+//     name: 'city',
+//     label: 'City',
+//     placeholder: 'Enter city'
+//   },
+//   {
+//     name: 'zip',
+//     label: 'Zip',
+//     placeholder: 'Enter zip'
+//   },
+//   {
+//     name: 'country',
+//     label: 'Country',
+//     placeholder: 'Enter country'
+//   },
+//   {
+//     name: 'personName',
+//     label: 'Name',
+//     placeholder: 'Enter person name'
+//   },
+//   {
+//     name: 'phone',
+//     label: 'Phone',
+//     placeholder: 'Enter phone'
+//   },
+//   {
+//     name: 'email',
+//     label: 'Email',
+//     placeholder: 'Enter email'
+//   }
+// ]
 
 const formSchema = z.object({
   companyName: z
@@ -171,37 +236,63 @@ export const CompaniesPage: React.FC = () => {
       ]}
     >
       <Form {...form} watch={watch}>
-        <form className="space-y-4">
-          {formFields.map((formField) => (
-            <FormField
-              key={formField.name}
-              control={form.control}
-              // as the type of formFields.name
-              name={
-                formField.name as
-                  | 'number'
-                  | 'email'
-                  | 'companyName'
-                  | 'taxId'
-                  | 'street'
-                  | 'city'
-                  | 'zip'
-                  | 'country'
-                  | 'personName'
-                  | 'phone'
-              }
-              render={({ field }) => (
-                <FormItem>
-                  <div className="flex flex-row justify-between items-center mb-3 ">
-                    <FormLabel>{formField.label}</FormLabel>
-                    <FormMessage />
-                  </div>
-                  <FormControl>
-                    <FormInput {...field} name={field.name} placeholder={formField.placeholder} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+        <form className="grid grid-cols-2 grid-rows-1 gap-4 mt-2">
+          {formConfig.map((group) => (
+            <div className="gap-2 flex flex-col" key={group.title}>
+              <div className="gap-2 flex flex-col border rounded">
+                <div className="border-b bg-background flex flex-row justify-between items-center py-1 px-2">
+                  <p className="text-sm uppercase font-medium">{group.title}</p>
+                  <button>
+                    <InfoIcon className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="px-2.5 py-1 gap-2 flex flex-col">
+                  {group.fields.map((formField) => (
+                    <FormField
+                      key={formField.name}
+                      control={form.control}
+                      name={
+                        formField.name as
+                          | 'number'
+                          | 'email'
+                          | 'companyName'
+                          | 'taxId'
+                          | 'street'
+                          | 'city'
+                          | 'zip'
+                          | 'country'
+                          | 'personName'
+                          | 'phone'
+                      }
+                      render={({ field }) => (
+                        <FormItem className="gap-2">
+                          <div className="flex flex-row justify-between items-center">
+                            <FormLabel>{formField.label}</FormLabel>
+                            <FormMessage />
+                          </div>
+                          <FormControl>
+                            <FormInput
+                              {...field}
+                              name={field.name}
+                              placeholder={formField.placeholder}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  ))}
+                </div>
+                <div className="flex flex-row">
+                  <Button variant="default" className="flex-1 rounded-none">
+                    Save
+                  </Button>
+                  <div className="w-[1px] bg-white"></div>
+                  <Button variant="default" className="flex-1 rounded-none">
+                    Undo
+                  </Button>
+                </div>
+              </div>
+            </div>
           ))}
         </form>
       </Form>
