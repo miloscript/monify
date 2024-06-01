@@ -31,6 +31,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+      - name: Get next version
       - run: pnpm semantic-release --dry-run
         id: get-next-version
         env:
