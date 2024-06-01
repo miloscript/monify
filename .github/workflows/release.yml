@@ -72,12 +72,12 @@ jobs:
       - name: Delete outdated drafts
         uses: hugo19941994/delete-draft-releases@v1.0.0
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Create Release Draft
         uses: softprops/action-gh-release@v1
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           prerelease: true
           draft: true
