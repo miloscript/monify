@@ -124,6 +124,9 @@ jobs:
         run: echo "Next Version is ${{ needs.draft.outputs.version }} (${{ github.ref_name }})"
 
       - name: Update and push version tag
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm updateVersion
 
       - name: Write next version to meta.json
