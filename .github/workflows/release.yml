@@ -88,51 +88,51 @@ jobs:
       release-note: ${{ steps.release-note.outputs.release-note }}
       version: ${{ needs.get-next-version.outputs.new-release-version }}
 
-  # upload_artifacts:
-  #   needs: [draft]
+  upload_artifacts:
+    needs: [draft]
 
-  #   strategy:
-  #     matrix:
-  #       os: [macos-latest, ubuntu-latest, windows-latest]
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
 
-  #   runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
 
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 20
-  #         cache: 'pnpm'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
 
-  #     - run: p install --frozen-lockfile
-  #       env:
-  #         PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+      - run: p install --frozen-lockfile
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
 
-  #     - name: Prepare release notes
-  #       env:
-  #         RELEASE_NOTE: ${{ needs.draft.outputs.release-note }}
-  #       run: echo "$RELEASE_NOTE" >> ./buildResources/release-notes.md
+      - name: Prepare release notes
+        env:
+          RELEASE_NOTE: ${{ needs.draft.outputs.release-note }}
+        run: echo "$RELEASE_NOTE" >> ./buildResources/release-notes.md
 
-  #     - name: Show version
-  #       run: echo "Next Version is ${{ needs.draft.outputs.version }} (${{ github.ref_name }})"
+      - name: Show version
+        run: echo "Next Version is ${{ needs.draft.outputs.version }} (${{ github.ref_name }})"
 
-  #     - name: Update and push version tag
-  #       run: pnpm updateVersion
+      - name: Update and push version tag
+        run: pnpm updateVersion
 
-  #     - name: Write next version to meta.json
-  #       run: echo "{\"version\":\"${{ needs.draft.outputs.version }}\"}" >| ./buildResources/meta.json
+      - name: Write next version to meta.json
+        run: echo "{\"version\":\"${{ needs.draft.outputs.version }}\"}" >| ./buildResources/meta.json
 
-  #     - name: Build the app
-  #       env:
-  #         MODE: 'production'
-  #       run: pnpm build
+      - name: Build the app
+        env:
+          MODE: 'production'
+        run: pnpm build
 
-  #     - name: Compile & release Electron app
-  #       id: release-to-github
-  #       env:
-  #         VITE_APP_VERSION: ${{ needs.draft.outputs.version }}
-  #       run: pnpm release
+      - name: Compile & release Electron app
+        id: release-to-github
+        env:
+          VITE_APP_VERSION: ${{ needs.draft.outputs.version }}
+        run: pnpm release
 
-  #     - name: Delete tag for failed release
-  #       if: steps.release-to-github.outcome == 'failure'
-  #       run: git push --delete origin v${{ needs.draft.outputs.version }}
+      - name: Delete tag for failed release
+        if: steps.release-to-github.outcome == 'failure'
+        run: git push --delete origin v${{ needs.draft.outputs.version }}
