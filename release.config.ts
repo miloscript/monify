@@ -1,7 +1,6 @@
 export default {
   branches: [
-    'main',
-    'ci-ga'
+    'main'
     // 'next',
     // 'next-major',
     // { name: 'beta', prerelease: true },
