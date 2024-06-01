@@ -4,17 +4,18 @@ on:
   push:
     branches:
       - main
+      - ci-ga
       # - alpha
       # - beta
     paths-ignore:
       - '**.md'
       - .editorconfig
       - .gitignore
-  pull_request:
-    paths-ignore:
-      - '**.md'
-      - .editorconfig
-      - .gitignore
+  # pull_request:
+  #   paths-ignore:
+  #     - '**.md'
+  #     - .editorconfig
+  #     - .gitignore
 
 concurrency:
   group: ci-${{ github.ref }}
