@@ -11,11 +11,11 @@ on:
       - '**.md'
       - .editorconfig
       - .gitignore
-  # pull_request:
-  #   paths-ignore:
-  #     - '**.md'
-  #     - .editorconfig
-  #     - .gitignore
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - .editorconfig
+      - .gitignore
 
 concurrency:
   group: ci-${{ github.ref }}
