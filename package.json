@@ -21,7 +21,7 @@
     "build:mac": "electron-vite build && electron-builder --mac",
     "build:linux": "electron-vite build && electron-builder --linux",
     "prepare": "husky",
-    "release": "electron-vite build && electron-builder --mac --publish always",
+    "release": "electron-vite build && electron-builder --publish always",
     "updateVersion": "semantic-release",
     "releaseNext": "electron-builder --config .electron-builder.config.js --publish always"
   },
