@@ -10,12 +10,6 @@ defaults:
     shell: 'bash'
 env:
   GH_TOKEN: ${{ secrets.github_token }}
-
-
-    runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        node-version: [20]
 jobs:
   get-next-version:
     runs-on: ubuntu-22.04
