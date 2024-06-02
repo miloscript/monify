@@ -1,13 +1,13 @@
-import { IpcMainEvent, app, ipcMain } from 'electron'
+import { IpcMainEvent, app, ipcMain, shell } from 'electron'
 import { DataState } from '../../shared/data.types'
-import { readStateFromFile, saveStateToFile } from '../utils/main.utils'
+import { exportDateFormat, readStateFromFile, saveStateToFile } from '../utils/main.utils'
 
 export interface ElectronApi {
   getState: () => Promise<DataState>
   setState: (state: DataState) => Promise<DataState>
 }
 
-type ElectronEventName = 'get-data' | 'set-data'
+type ElectronEventName = 'get-data' | 'set-data' | 'export-and-open-downloads'
 
 type ElectronEvent = {
   name: ElectronEventName
@@ -31,6 +31,19 @@ const events: ElectronEvent[] = [
     handler: (_: IpcMainEvent, state: DataState) => {
       const stateFilePath = app.getPath('userData') + '/data/state.json'
       saveStateToFile(stateFilePath, state)
+    }
+  },
+  {
+    name: 'export-and-open-downloads',
+    type: 'on',
+    handler: async () => {
+      const state = await readStateFromFile(app.getPath('userData') + '/data/state.json')
+      if (!state) return
+
+      const exportFilePath = app.getPath('downloads') + `/monify-export-${exportDateFormat()}.json`
+      saveStateToFile(exportFilePath, state)
+
+      shell.openPath(app.getPath('downloads'))
     }
   }
 ]
