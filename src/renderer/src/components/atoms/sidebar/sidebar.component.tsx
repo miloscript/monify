@@ -64,11 +64,11 @@ export const Sidebar = ({ company }: SidebarProps) => {
           </CollapsibleTrigger>
           <CollapsibleContent>
             <Link
-              to="/data/companies"
+              to="/profile/edit"
               className={cn(
                 'text-sm font-medium flex flex-row justify-start items-center px-2.5 h-[26px] border-b',
                 'hover:bg-black hover:text-white',
-                isActive('/data/companies') && 'bg-black text-white font-semibold'
+                isActive('/profile/edit') && 'bg-black text-white font-semibold'
               )}
             >
               <Building2Icon className="w-4 h-5 mr-2" />

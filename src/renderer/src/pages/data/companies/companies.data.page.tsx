@@ -81,59 +81,6 @@ const formConfig = [
   }
 ]
 
-// const formFields = [
-//   {
-//     name: 'companyName',
-//     label: 'Company Name',
-//     placeholder: 'Enter company name'
-//   },
-//   {
-//     name: 'taxId',
-//     label: 'Tax ID',
-//     placeholder: 'Enter tax ID'
-//   },
-//   {
-//     name: 'street',
-//     label: 'Street',
-//     placeholder: 'Enter street'
-//   },
-//   {
-//     name: 'number',
-//     label: 'Number',
-//     placeholder: 'Enter number'
-//   },
-//   {
-//     name: 'city',
-//     label: 'City',
-//     placeholder: 'Enter city'
-//   },
-//   {
-//     name: 'zip',
-//     label: 'Zip',
-//     placeholder: 'Enter zip'
-//   },
-//   {
-//     name: 'country',
-//     label: 'Country',
-//     placeholder: 'Enter country'
-//   },
-//   {
-//     name: 'personName',
-//     label: 'Name',
-//     placeholder: 'Enter person name'
-//   },
-//   {
-//     name: 'phone',
-//     label: 'Phone',
-//     placeholder: 'Enter phone'
-//   },
-//   {
-//     name: 'email',
-//     label: 'Email',
-//     placeholder: 'Enter email'
-//   }
-// ]
-
 const formSchema = z.object({
   companyName: z
     .string()
