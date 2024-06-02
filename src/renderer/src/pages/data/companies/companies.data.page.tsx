@@ -176,12 +176,7 @@ export const CompaniesPage: React.FC = () => {
   }, [form.handleSubmit, watch])
 
   return (
-    <MainLayout
-      crumbs={[
-        { name: 'Data', path: '/data' },
-        { name: 'Edit company', path: '/data/companies' }
-      ]}
-    >
+    <MainLayout crumbs={[{ name: 'Edit profile', path: '/profile/edit' }]}>
       <Form {...form} watch={watch}>
         <form className="grid grid-cols-2 grid-rows-1 gap-4 mt-2">
           {formConfig.map((group) => (
