@@ -62,7 +62,7 @@ const router = createHashRouter([
     element: <DataPage />
   },
   {
-    path: '/data/companies',
+    path: '/profile/edit',
     element: <CompaniesPage />
   },
   {
