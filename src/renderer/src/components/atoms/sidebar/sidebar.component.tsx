@@ -48,7 +48,7 @@ export const Sidebar = ({ company }: SidebarProps) => {
               onClick={openCompanySubMenu}
               className={cn(
                 'h-[38px] px-3 py-1 flex flex-row justify-between items-center gap-x-2 border-b cursor-pointer',
-                'hover:bg-black hover:text-white'
+                'hover:bg-hover hover:underline'
               )}
             >
               <div className="flex flex-row justify-start items-center gap-x-2">
@@ -67,8 +67,8 @@ export const Sidebar = ({ company }: SidebarProps) => {
               to="/profile/edit"
               className={cn(
                 'text-sm font-medium flex flex-row justify-start items-center px-2.5 h-[26px] border-b',
-                'hover:bg-black hover:text-white',
-                isActive('/profile/edit') && 'bg-black text-white font-semibold'
+                'hover:bg-hover hover:underline',
+                isActive('/profile/edit') && 'bg-hover font-semibold'
               )}
             >
               <Building2Icon className="w-4 h-5 mr-2" />
@@ -80,8 +80,8 @@ export const Sidebar = ({ company }: SidebarProps) => {
           to="/"
           className={cn(
             'text-sm font-medium flex flex-row justify-start items-center px-2.5 h-[26px]',
-            'hover:bg-black hover:text-white',
-            isActive('/') && 'bg-black text-white font-semibold'
+            'hover:bg-hover hover:underline',
+            isActive('/') && 'bg-hover font-semibold'
           )}
         >
           <FileIcon className="w-4 h-5 mr-2" />
@@ -91,8 +91,8 @@ export const Sidebar = ({ company }: SidebarProps) => {
           to="/expenses"
           className={cn(
             'text-sm font-medium flex flex-row justify-start items-center px-2.5 h-[26px]',
-            'hover:bg-black hover:text-white',
-            isActive('/expenses') && 'bg-black text-white font-semibold'
+            'hover:bg-hover hover:underline',
+            isActive('/expenses') && 'bg-hover font-semibold'
           )}
         >
           <BanknoteIcon className="w-4 h-5 mr-2" />
@@ -103,8 +103,8 @@ export const Sidebar = ({ company }: SidebarProps) => {
             to="/data"
             className={cn(
               'text-sm font-medium flex flex-row justify-start items-center px-2.5 h-[26px]',
-              'hover:bg-black hover:text-white',
-              isActive('/data') && 'bg-black text-white font-semibold'
+              'hover:bg-hover hover:underline',
+              isActive('/data') && 'bg-hover font-semibold'
             )}
           >
             <DatabaseIcon className="w-4 h-5 mr-2" />
