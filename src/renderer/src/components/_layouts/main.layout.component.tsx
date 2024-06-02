@@ -75,7 +75,7 @@ export const MainLayout = ({ actions, children, crumbs, className }: Props): JSX
           }}
         >
           {actions && (
-            <div className="border-b px-4 py-2">
+            <div className="border-b px-2 py-2 flex flex-row justify-end">
               {actions.map((action, index) => (
                 <Button key={index} onClick={action.onClick} variant="default" size="sm">
                   {action.icon}

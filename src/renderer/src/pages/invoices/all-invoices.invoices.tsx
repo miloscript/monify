@@ -3,7 +3,6 @@ import { Button } from '@renderer/components/elements/button/button.component'
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -37,7 +36,7 @@ export const AllInvoices: React.FC = () => {
       ]}
     >
       <Table>
-        <TableCaption>A list of your clients.</TableCaption>
+        {/* <TableCaption>A list of your clients.</TableCaption> */}
         <TableHeader>
           <TableRow>
             <TableHead className="w-[100px]">Number</TableHead>
@@ -54,26 +53,30 @@ export const AllInvoices: React.FC = () => {
               <TableCell>{invoice.performancePeriod}</TableCell>
               <TableCell>{invoice.date}</TableCell>
               <TableCell>{invoice.to.name}</TableCell>
-              <TableCell className="text-right">
-                <Button
-                  onClick={() => {
-                    navigate(`/invoices/${invoice.id}/view`)
-                  }}
-                  variant="ghost"
-                >
-                  <FileIcon />
-                </Button>
-                <Button
-                  onClick={() => {
-                    navigate(`/invoices/${invoice.id}/edit`)
-                  }}
-                  variant="ghost"
-                >
-                  <Edit />
-                </Button>
-                <Button onClick={() => handleRemoveClient(invoice.id)} variant="ghost">
-                  <Trash2 />
-                </Button>
+              <TableCell align="justify" className="text-right">
+                <div className="flex flex-row justify-end items-center gap-x-1">
+                  <Button
+                    size="icon"
+                    variant="link"
+                    onClick={() => {
+                      navigate(`/invoices/${invoice.id}/view`)
+                    }}
+                  >
+                    <FileIcon className="size-3.5" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="link"
+                    onClick={() => {
+                      navigate(`/invoices/${invoice.id}/edit`)
+                    }}
+                  >
+                    <Edit className="size-3.5" />
+                  </Button>
+                  <Button size="icon" variant="link" onClick={() => handleRemoveClient(invoice.id)}>
+                    <Trash2 className="size-3.5 mr-[-4px] text-destructive" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
