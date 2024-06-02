@@ -11,11 +11,19 @@ import { useDimensions } from '@renderer/hooks/use-dimensions.hook'
 
 import { useMemo } from 'react'
 
+import { cn } from '@renderer/lib/utils'
 import useDataStore from '@renderer/store/data.store'
 import { useLocation } from 'react-router-dom'
 import { Sidebar } from '../atoms/sidebar/sidebar.component'
+import { Button } from '../elements/button/button.component'
 
 interface Props {
+  className?: string
+  actions?: {
+    name: string
+    icon?: React.ReactNode
+    onClick: () => void
+  }[]
   crumbs?: {
     name: string
     path: string
@@ -23,7 +31,7 @@ interface Props {
   children: React.ReactNode
 }
 
-export const MainLayout = ({ children, crumbs }: Props): JSX.Element => {
+export const MainLayout = ({ actions, children, crumbs, className }: Props): JSX.Element => {
   const location = useLocation()
   const { height: windowHeight } = useDimensions()
 
@@ -66,7 +74,17 @@ export const MainLayout = ({ children, crumbs }: Props): JSX.Element => {
             height: `${mainAreaHeight}px`
           }}
         >
-          <div className="px-4 py-2">{children}</div>
+          {actions && (
+            <div className="border-b px-4 py-2">
+              {actions.map((action, index) => (
+                <Button key={index} onClick={action.onClick} variant="default" size="sm">
+                  {action.icon}
+                  {action.name}
+                </Button>
+              ))}
+            </div>
+          )}
+          <div className={cn('px-4 py-1', className)}>{children}</div>
         </ScrollArea>
       </div>
     </div>

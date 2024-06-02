@@ -23,15 +23,19 @@ export const AllInvoices: React.FC = () => {
 
   return (
     <MainLayout
+      className="p-0"
+      actions={[
+        {
+          name: 'Add New',
+          icon: <PlusIcon className="size-4 mr-2" />,
+          onClick: () => navigate('/invoices/add')
+        }
+      ]}
       crumbs={[
         { name: 'Invoices', path: '/' },
         { name: 'All Invoices', path: '/invoices' }
       ]}
     >
-      <Button onClick={() => navigate('/invoices/add')} variant="default" size="default">
-        <PlusIcon className="size-4" />
-        Add Invoice
-      </Button>
       <Table>
         <TableCaption>A list of your clients.</TableCaption>
         <TableHeader>
