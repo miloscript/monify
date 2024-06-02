@@ -1,3 +1,4 @@
+import { exportAndOpenDownloads } from '@renderer/api/main.api'
 import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import { Button } from '@renderer/components/elements/button/button.component'
 import useDataStore from '@renderer/store/data.store'
@@ -8,7 +9,7 @@ export const ExportPage: React.FC = () => {
   const [showDebug, setShowDebug] = useState(false)
 
   const onExport = () => {
-    console.log(state)
+    exportAndOpenDownloads()
   }
 
   return (
