@@ -8,7 +8,6 @@ import { cn } from '@renderer/lib/utils'
 import useUiStore from '@renderer/store/ui.store'
 import { Company } from '@shared/data.types'
 import {
-  ArrowLeftFromLineIcon,
   BanknoteIcon,
   Building2Icon,
   ChevronsUpDownIcon,
@@ -36,17 +35,17 @@ export const Sidebar = ({ company }: SidebarProps) => {
 
   return (
     <aside className="w-[240px] border-r h-[100vh] flex flex-col fixed">
-      <div className="border-b flex justify-end items-center px-2 h-[36px]">
+      {/* <div className="border-b flex justify-end items-center px-2 h-[36px]">
         <button className="hover:bg-accent cursor-pointer rounded size-6 flex justify-center items-center">
           <ArrowLeftFromLineIcon className="size-4" />
         </button>
-      </div>
-      <nav>
-        <Collapsible open={sideMenu.accountDropdownOpened}>
+      </div> */}
+      <nav className="flex flex-col gap-y-0.5">
+        <Collapsible className="flex flex-col gap-y-0.5" open={sideMenu.accountDropdownOpened}>
           <CollapsibleTrigger asChild onClick={openCompanySubMenu}>
             <div
               className={cn(
-                'h-[38px] px-3 py-1 flex flex-row justify-between items-center gap-x-2 border-b cursor-pointer',
+                'h-[36px] px-3 py-1 flex flex-row justify-between items-center gap-x-2 border-b cursor-pointer',
                 'hover:bg-hover hover:underline'
               )}
             >
