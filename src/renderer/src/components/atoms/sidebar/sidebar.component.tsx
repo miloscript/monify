@@ -5,6 +5,7 @@ import {
   CollapsibleTrigger
 } from '@renderer/components/elements/collapsible/collapsible.component'
 import { cn } from '@renderer/lib/utils'
+import useUiStore from '@renderer/store/ui.store'
 import { Company } from '@shared/data.types'
 import {
   ArrowLeftFromLineIcon,
@@ -14,7 +15,6 @@ import {
   DatabaseIcon,
   FileIcon
 } from 'lucide-react'
-import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 export interface SidebarProps {
@@ -23,7 +23,7 @@ export interface SidebarProps {
 
 export const Sidebar = ({ company }: SidebarProps) => {
   const location = useLocation()
-  const [companySubMenuOpen, setCompanySubMenuOpen] = useState(false)
+  const { sideMenu, toggleAccountDropdown } = useUiStore((state) => state)
 
   const isActive = (path: string) => {
     if (path === '/') return location.pathname === path
@@ -31,7 +31,7 @@ export const Sidebar = ({ company }: SidebarProps) => {
   }
 
   const openCompanySubMenu = () => {
-    setCompanySubMenuOpen(!companySubMenuOpen)
+    toggleAccountDropdown()
   }
 
   return (
@@ -42,10 +42,9 @@ export const Sidebar = ({ company }: SidebarProps) => {
         </button>
       </div>
       <nav>
-        <Collapsible open={companySubMenuOpen}>
+        <Collapsible open={sideMenu.accountDropdownOpened}>
           <CollapsibleTrigger asChild onClick={openCompanySubMenu}>
             <div
-              onClick={openCompanySubMenu}
               className={cn(
                 'h-[38px] px-3 py-1 flex flex-row justify-between items-center gap-x-2 border-b cursor-pointer',
                 'hover:bg-hover hover:underline'
