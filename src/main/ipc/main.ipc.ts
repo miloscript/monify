@@ -1,4 +1,4 @@
-import { IpcMainEvent, app, ipcMain, shell } from 'electron'
+import { IpcMainEvent, app, dialog, ipcMain, shell } from 'electron'
 import { DataState } from '../../shared/data.types'
 import { exportDateFormat, readStateFromFile, saveStateToFile } from '../utils/main.utils'
 
@@ -7,7 +7,7 @@ export interface ElectronApi {
   setState: (state: DataState) => Promise<DataState>
 }
 
-type ElectronEventName = 'get-data' | 'set-data' | 'export-and-open-downloads'
+type ElectronEventName = 'get-data' | 'set-data' | 'export-and-open-downloads' | 'open-dialog'
 
 type ElectronEvent = {
   name: ElectronEventName
@@ -44,6 +44,14 @@ const events: ElectronEvent[] = [
       saveStateToFile(exportFilePath, state)
 
       shell.openPath(app.getPath('downloads'))
+    }
+  },
+  {
+    name: 'open-dialog',
+    type: 'handle',
+    handler: async () => {
+      const result = await dialog.showOpenDialog({ properties: ['openFile'] })
+      console.log(result)
     }
   }
 ]

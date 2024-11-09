@@ -11,3 +11,7 @@ export const getData = (): Promise<DataState> => {
 export const exportAndOpenDownloads = () => {
   window.electron.ipcRenderer.send('export-and-open-downloads')
 }
+
+export const openDialog = async () => {
+  return window.electron.ipcRenderer.invoke('open-dialog')
+}

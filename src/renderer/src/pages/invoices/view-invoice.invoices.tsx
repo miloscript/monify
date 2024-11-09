@@ -54,8 +54,6 @@ export const ViewInvoicePage: React.FC = () => {
 
   const invoice = useDataStore((state) => state.invoices.find((invoice) => invoice.id === id))
 
-  console.log(invoice)
-
   return (
     <MainLayout
       crumbs={[
@@ -195,6 +193,7 @@ export const ViewInvoicePage: React.FC = () => {
                 }}
               >
                 {invoice?.items.map((item: InvoiceProject) => {
+                  if (item.hours < 1) return null
                   return (
                     <View
                       key={item.id}

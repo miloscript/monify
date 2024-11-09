@@ -37,6 +37,7 @@ export interface Client extends Company {
 }
 
 export interface TransactionLabel {
+  accountId: string
   id: string
   name: string
 }

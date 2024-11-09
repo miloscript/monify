@@ -12,6 +12,7 @@ import {
   Building2Icon,
   ChevronsUpDownIcon,
   DatabaseIcon,
+  DollarSignIcon,
   FileIcon
 } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
@@ -35,11 +36,6 @@ export const Sidebar = ({ company }: SidebarProps) => {
 
   return (
     <aside className="w-[240px] border-r h-[100vh] flex flex-col fixed">
-      {/* <div className="border-b flex justify-end items-center px-2 h-[36px]">
-        <button className="hover:bg-accent cursor-pointer rounded size-6 flex justify-center items-center">
-          <ArrowLeftFromLineIcon className="size-4" />
-        </button>
-      </div> */}
       <nav className="flex flex-col gap-y-0.5">
         <Collapsible className="flex flex-col gap-y-0.5" open={sideMenu.accountDropdownOpened}>
           <CollapsibleTrigger asChild onClick={openCompanySubMenu}>
@@ -84,6 +80,17 @@ export const Sidebar = ({ company }: SidebarProps) => {
         >
           <FileIcon className="w-4 h-5 mr-2" />
           Invoices
+        </Link>
+        <Link
+          to="/finances"
+          className={cn(
+            'text-sm font-medium flex flex-row justify-start items-center px-2.5 h-[26px]',
+            'hover:bg-hover hover:underline',
+            isActive('/finances') && 'bg-hover font-semibold'
+          )}
+        >
+          <DollarSignIcon className="w-4 h-5 mr-2" />
+          Finances
         </Link>
         <Link
           to="/expenses"

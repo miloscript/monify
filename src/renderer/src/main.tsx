@@ -17,6 +17,9 @@ import { ProjectsPage } from './pages/data/projects/projects.data.page'
 import { ExpensesPage } from './pages/expenses/expenses.page'
 import { ImportsPage } from './pages/expenses/imports.expenses.page'
 import { StatsPage } from './pages/expenses/stats.expenses.page'
+import { FinancesDashboardPage } from './pages/finances/dashboard.finances.page'
+import { FinancesDataPage } from './pages/finances/data.finances.page'
+import { FinancesPage } from './pages/finances/finances.page'
 import { AddInvoicePage } from './pages/invoices/add-invoice.invoices'
 import { AllInvoices } from './pages/invoices/all-invoices.invoices'
 import { EditInvoicePage } from './pages/invoices/edit-invoice.invoices'
@@ -57,6 +60,9 @@ const router = createHashRouter([
     path: '/expenses/stats',
     element: <StatsPage />
   },
+  { path: '/finances', element: <FinancesPage /> },
+  { path: '/finances/data', element: <FinancesDataPage /> },
+  { path: '/finances/dashboard', element: <FinancesDashboardPage /> },
   {
     path: '/data',
     element: <DataPage />
