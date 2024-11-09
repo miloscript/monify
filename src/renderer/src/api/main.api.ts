@@ -1,4 +1,5 @@
 import { DataState } from '@shared/data.types'
+import xlsx from "xlsx";
 
 export const saveData = (data: DataState) => {
   window.electron.ipcRenderer.send('set-data', data)
@@ -12,6 +13,6 @@ export const exportAndOpenDownloads = () => {
   window.electron.ipcRenderer.send('export-and-open-downloads')
 }
 
-export const openDialog = async () => {
+export const openDialog = async (): Promise<xlsx.WorkBook> => {
   return window.electron.ipcRenderer.invoke('open-dialog')
 }
