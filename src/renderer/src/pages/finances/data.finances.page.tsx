@@ -1,40 +1,39 @@
 import { openDialog } from '@renderer/api/main.api'
 import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import { Button } from '@renderer/components/elements/button/button.component'
-import { Typography } from '@renderer/components/elements/typography/typography.component'
-import { useState } from 'react'
-import { v4 as uuidv4 } from 'uuid'
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow
 } from '@renderer/components/elements/table/table.component'
+import { Typography } from '@renderer/components/elements/typography/typography.component'
+import useDataStore from '@renderer/store/data.store'
+import { BankAccount, BankTransaction } from '@shared/data.types'
+import { useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 
-interface BankTransaction {
-  id: string
-  valueDate: string // Datum valute | Value Date
-  beneficiaryOrderingParty: string // Naziv primaoca pošiljaoca | Beneficiary Ordering Party
-  beneficiaryOrderingAddress: string // Mesto primaoca pošiljaoca | Beneficiary Ordering Address
-  beneficiaryAccountNumber: string // Broj računa primaoca pošiljaoca | Account Number
-  paymentCode: string // Šifra plaćanja | Payment Code
-  paymentPurpose: string // Svrha plaćanja | Purpose
-  debitModel: string // Model zaduženja | Debit Model
-  debitReferenceNumber: string // Poziv na broj zaduženja | Debit Reference Number
-  creditModel: string // Model odobrenja | Credit Model
-  creditReferenceNumber: string // Poziv na broj odobrenja | Credit Reference Number
-  debitAmount: number // Na teret | Debit Amount
-  creditAmount: number // U korist | Credit Amount
-  yourReferenceNumber: string // Vaš broj naloga | Your Reference Number
-  complaintNumber: string // Broj za reklamaciju | Complaint Number
-  paymentReferenceNumber: string // Referenca naloga | Payment Reference Number
+const initialAccount: BankAccount = {
+  id: 'd59be728-5128-4e75-9e91-ef2ec4bd04fb',
+  number: '265110031008489974',
+  bank: 'Raiffeisen',
+  transactions: []
 }
 
 export const FinancesDataPage: React.FC = () => {
-  const [transactions, setTransactions] =useState<BankTransaction[]>([])
+  const { addBankAccount, addBankTransactions, bankAccounts } = useDataStore((state) => state)
+  const { bankTransactions } = useDataStore((state) => {
+    return {
+      bankTransactions: state.bankAccounts
+        .filter((account) => account.number === initialAccount.number)
+        .flatMap((account) => account.transactions)
+    }
+  })
+
+  const [storedTransactions, setStoredTransactions] = useState<BankTransaction[]>(bankTransactions)
+
   const handleOpenDialog = async () => {
     const stringMatrix: string[][] = []
     const bla = await openDialog()
@@ -71,8 +70,14 @@ export const FinancesDataPage: React.FC = () => {
         paymentReferenceNumber: arr[14]
       }
     })
-    console.log(parsed)
-    setTransactions(parsed)
+    const filtered = parsed
+      .filter((item) => item !== undefined)
+      .filter((item) => !item.valueDate.includes('Prethodno stanje'))
+
+    if (bankAccounts.filter((account) => account.number === initialAccount.number).length === 0) {
+      addBankAccount(initialAccount)
+    }
+    addBankTransactions(initialAccount.id, filtered)
   }
   return (
     <MainLayout
@@ -85,37 +90,36 @@ export const FinancesDataPage: React.FC = () => {
         Finance Data
       </Typography>
       <div className="flex flex-col gap-y-2">
-        <Button onClick={handleOpenDialog}>Dialog</Button>
+        <Button onClick={handleOpenDialog}>Import XLS</Button>
         <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">Value Date</TableHead>
-            <TableHead>Beneficiary</TableHead>
-            <TableHead>Purpose</TableHead>
-            <TableHead>Payment Code</TableHead>
-            <TableHead>Debit Amount</TableHead>
-            <TableHead>Credit Amount</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {transactions.map((client) => (
-            <TableRow key={client.id}>
-              <TableCell className="font-medium">{client.valueDate}</TableCell>
-              <TableCell>{client.beneficiaryOrderingParty}</TableCell>
-              <TableCell>{client.paymentPurpose}</TableCell>
-              <TableCell>{client.paymentCode}</TableCell>
-              <TableCell>{client.debitAmount}</TableCell>
-              <TableCell>{client.creditAmount}</TableCell>
-              <TableCell className="text-right">
-                <Button variant="ghost">Edit</Button>
-                <Button variant="ghost">Delete</Button>
-              </TableCell>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Value Date</TableHead>
+              <TableHead>Beneficiary</TableHead>
+              <TableHead>Purpose</TableHead>
+              <TableHead>Payment Code</TableHead>
+              <TableHead>Debit Amount</TableHead>
+              <TableHead>Credit Amount</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
- 
+          </TableHeader>
+          <TableBody>
+            {storedTransactions.map((client) => (
+              <TableRow key={client?.id}>
+                <TableCell className="font-medium">{client?.valueDate}</TableCell>
+                <TableCell>{client?.beneficiaryOrderingParty}</TableCell>
+                <TableCell>{client?.paymentPurpose}</TableCell>
+                <TableCell>{client?.paymentCode}</TableCell>
+                <TableCell>{client?.debitAmount}</TableCell>
+                <TableCell>{client?.creditAmount}</TableCell>
+                <TableCell className="text-right">
+                  <Button variant="ghost">Edit</Button>
+                  <Button variant="ghost">Delete</Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     </MainLayout>
   )

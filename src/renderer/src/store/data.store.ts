@@ -4,6 +4,8 @@ import { StateStorage, createJSONStorage, persist } from 'zustand/middleware'
 import { getData, saveData } from '@renderer/api/main.api'
 import {
   Account,
+  BankAccount,
+  BankTransaction,
   DataState,
   Invoice,
   Project,
@@ -35,6 +37,7 @@ const initialState: DataState = {
       transactions: []
     }
   ],
+  bankAccounts: [],
   clients: [],
   invoices: [],
   app: {
@@ -88,6 +91,9 @@ type DataAction = {
   addInvoice(invoice: Invoice): void
   editInvoice(invoice: Invoice): void
   removeInvoice(invoiceId: string): void
+
+  addBankAccount(account: BankAccount): void
+  addBankTransactions(accountId: string, transaction: BankTransaction[]): void
 }
 
 const useDataStore = create<DataState & DataAction>()(
@@ -95,6 +101,22 @@ const useDataStore = create<DataState & DataAction>()(
     (set) => ({
       ...initialState,
       clients: [],
+      addBankAccount: (account) =>
+        set((state) => ({
+          bankAccounts: [...state.bankAccounts, account]
+        })),
+      addBankTransactions: (accountId, transactions) => {
+        set((state) => ({
+          bankAccounts: state.bankAccounts.map((account) =>
+            account.id === accountId
+              ? {
+                  ...account,
+                  transactions: [...account.transactions, ...transactions]
+                }
+              : account
+          )
+        }))
+      },
 
       addInvoice: (invoice) =>
         set((state) => ({

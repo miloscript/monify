@@ -72,11 +72,38 @@ export interface Invoice {
   items: InvoiceProject[]
 }
 
+export interface BankTransaction {
+  id: string
+  valueDate: string // Datum valute | Value Date
+  beneficiaryOrderingParty: string // Naziv primaoca pošiljaoca | Beneficiary Ordering Party
+  beneficiaryOrderingAddress: string // Mesto primaoca pošiljaoca | Beneficiary Ordering Address
+  beneficiaryAccountNumber: string // Broj računa primaoca pošiljaoca | Account Number
+  paymentCode: string // Šifra plaćanja | Payment Code
+  paymentPurpose: string // Svrha plaćanja | Purpose
+  debitModel: string // Model zaduženja | Debit Model
+  debitReferenceNumber: string // Poziv na broj zaduženja | Debit Reference Number
+  creditModel: string // Model odobrenja | Credit Model
+  creditReferenceNumber: string // Poziv na broj odobrenja | Credit Reference Number
+  debitAmount: number // Na teret | Debit Amount
+  creditAmount: number // U korist | Credit Amount
+  yourReferenceNumber: string // Vaš broj naloga | Your Reference Number
+  complaintNumber: string // Broj za reklamaciju | Complaint Number
+  paymentReferenceNumber: string // Referenca naloga | Payment Reference Number
+}
+
+export interface BankAccount {
+  id: string
+  number: string
+  bank: 'Intesa' | 'Raiffeisen' | 'Societe Generale' | 'Erste'
+  transactions: BankTransaction[]
+}
+
 export interface DataState {
   invoices: Invoice[]
   company: Company
   clients: Client[]
   accounts: Account[]
+  bankAccounts: BankAccount[]
   app: {
     config: {
       transaction: {

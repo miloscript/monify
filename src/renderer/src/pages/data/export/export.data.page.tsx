@@ -1,3 +1,4 @@
+import ReactJson from '@microlink/react-json-view'
 import { exportAndOpenDownloads } from '@renderer/api/main.api'
 import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import { Button } from '@renderer/components/elements/button/button.component'
@@ -26,18 +27,15 @@ export const ExportPage: React.FC = () => {
           <input className="cursor-pointer" checked={showDebug} type="checkbox" />
         </div>
         {showDebug && (
-          <pre>
-            {JSON.stringify(
-              {
-                company: state.company,
-                clients: state.clients,
-                invoices: state.invoices,
-                app: state.app
-              },
-              null,
-              2
-            )}
-          </pre>
+          <ReactJson
+            collapsed={3}
+            src={state}
+            displayDataTypes={false}
+            displayObjectSize={false}
+            style={{
+              fontSize: '0.6rem'
+            }}
+          />
         )}
       </div>
     </MainLayout>

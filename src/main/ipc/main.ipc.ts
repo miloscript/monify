@@ -2,8 +2,7 @@ import { IpcMainEvent, app, dialog, ipcMain, shell } from 'electron'
 import { DataState } from '../../shared/data.types'
 import { exportDateFormat, readStateFromFile, saveStateToFile } from '../utils/main.utils'
 
-import xlsx from "xlsx";
-
+import xlsx from 'xlsx'
 
 export interface ElectronApi {
   getState: () => Promise<DataState>
@@ -25,6 +24,7 @@ const events: ElectronEvent[] = [
     handler: async () => {
       const stateFilePath = app.getPath('userData') + '/data/state.json'
       const state = await readStateFromFile(stateFilePath)
+      console.log(app.getPath('userData'))
       return state
     }
   },
@@ -54,7 +54,7 @@ const events: ElectronEvent[] = [
     type: 'handle',
     handler: async () => {
       const result = await dialog.showOpenDialog({ properties: ['openFile'] })
-      const workbook = xlsx.readFile(result.filePaths[0]);
+      const workbook = xlsx.readFile(result.filePaths[0])
       return workbook
     }
   }
