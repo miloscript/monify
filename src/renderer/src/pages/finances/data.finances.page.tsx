@@ -12,7 +12,6 @@ import {
 import { Typography } from '@renderer/components/elements/typography/typography.component'
 import useDataStore from '@renderer/store/data.store'
 import { BankAccount, BankTransaction } from '@shared/data.types'
-import { useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
 const initialAccount: BankAccount = {
@@ -31,8 +30,6 @@ export const FinancesDataPage: React.FC = () => {
         .flatMap((account) => account.transactions)
     }
   })
-
-  const [storedTransactions, setStoredTransactions] = useState<BankTransaction[]>(bankTransactions)
 
   const handleOpenDialog = async () => {
     const stringMatrix: string[][] = []
@@ -74,10 +71,32 @@ export const FinancesDataPage: React.FC = () => {
       .filter((item) => item !== undefined)
       .filter((item) => !item.valueDate.includes('Prethodno stanje'))
 
+    const newValues = filtered.filter(
+      (item2) =>
+        !bankTransactions.some(
+          (item1) =>
+            item1.valueDate === item2.valueDate &&
+            item1.beneficiaryOrderingParty === item2.beneficiaryOrderingParty &&
+            item1.beneficiaryOrderingAddress === item2.beneficiaryOrderingAddress &&
+            item1.beneficiaryAccountNumber === item2.beneficiaryAccountNumber &&
+            item1.paymentCode === item2.paymentCode &&
+            item1.paymentPurpose === item2.paymentPurpose &&
+            item1.debitModel === item2.debitModel &&
+            item1.debitReferenceNumber === item2.debitReferenceNumber &&
+            item1.creditModel === item2.creditModel &&
+            item1.creditReferenceNumber === item2.creditReferenceNumber &&
+            item1.debitAmount === item2.debitAmount &&
+            item1.creditAmount === item2.creditAmount &&
+            item1.yourReferenceNumber === item2.yourReferenceNumber &&
+            item1.complaintNumber === item2.complaintNumber &&
+            item1.paymentReferenceNumber === item2.paymentReferenceNumber
+        )
+    )
+
     if (bankAccounts.filter((account) => account.number === initialAccount.number).length === 0) {
       addBankAccount(initialAccount)
     }
-    addBankTransactions(initialAccount.id, filtered)
+    addBankTransactions(initialAccount.id, newValues)
   }
   return (
     <MainLayout
@@ -100,11 +119,10 @@ export const FinancesDataPage: React.FC = () => {
               <TableHead>Payment Code</TableHead>
               <TableHead>Debit Amount</TableHead>
               <TableHead>Credit Amount</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {storedTransactions.map((client) => (
+            {bankTransactions.map((client) => (
               <TableRow key={client?.id}>
                 <TableCell className="font-medium">{client?.valueDate}</TableCell>
                 <TableCell>{client?.beneficiaryOrderingParty}</TableCell>
@@ -112,10 +130,6 @@ export const FinancesDataPage: React.FC = () => {
                 <TableCell>{client?.paymentCode}</TableCell>
                 <TableCell>{client?.debitAmount}</TableCell>
                 <TableCell>{client?.creditAmount}</TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost">Edit</Button>
-                  <Button variant="ghost">Delete</Button>
-                </TableCell>
               </TableRow>
             ))}
           </TableBody>
