@@ -6,7 +6,7 @@ import {
 } from '@renderer/components/elements/breadcrumbs/breadcrumbs.component'
 import { Button } from '@renderer/components/elements/button/button.component'
 import {
-  Table,
+  TableRoot,
   TableBody,
   TableCaption,
   TableCell,
@@ -50,7 +50,7 @@ export const ClientsTab: React.FC = () => {
             <BreadcrumbItem variant="active">View All</BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <Table>
+        <TableRoot>
           <TableCaption>A list of your clients.</TableCaption>
           <TableHeader>
             <TableRow>
@@ -82,7 +82,7 @@ export const ClientsTab: React.FC = () => {
               </TableRow>
             ))}
           </TableBody>
-        </Table>
+        </TableRoot>
       </TabsContent>
       <TabsContent value="add-client">
         <BreadcrumbList>

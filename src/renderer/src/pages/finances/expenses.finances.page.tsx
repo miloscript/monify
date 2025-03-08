@@ -1,6 +1,6 @@
 import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import {
-  Table,
+  TableRoot,
   TableBody,
   TableCell,
   TableHead,
@@ -94,7 +94,7 @@ export const FinancesExpensesPage: React.FC = () => {
         Finance Expenses
       </Typography>
       <div className="flex flex-col gap-y-2">
-        <Table>
+        <TableRoot>
           <TableHeader>
             <TableRow>
               <TableHead>Date</TableHead>
@@ -117,7 +117,7 @@ export const FinancesExpensesPage: React.FC = () => {
               </TableRow>
             ))}
           </TableBody>
-        </Table>
+        </TableRoot>
       </div>
     </MainLayout>
   )

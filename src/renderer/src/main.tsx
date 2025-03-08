@@ -5,8 +5,8 @@ import ReactDOM from 'react-dom/client'
 import { createHashRouter, RouterProvider } from 'react-router-dom'
 
 import { MainLayout } from './components/_layouts/main.layout.component'
-import { AddClientPage } from './pages/data/clients/add-client.data.page'
-import { ClientsPage } from './pages/data/clients/clients.data.page'
+import { AddClientPage } from './pages/data/clients/add-client/add-client.data.page'
+import { ClientsPage } from './pages/data/clients/all-clients.data.page'
 import { EditClientPage } from './pages/data/clients/edit-client.data.page'
 import { ProfilePage } from './pages/profile/profile.data.page'
 import { DataPage } from './pages/data/data.page'
@@ -83,7 +83,7 @@ const router = createHashRouter([
   },
   {
     path: '/data/clients/:id/edit',
-    element: <EditClientPage />
+    element: <AddClientPage />
   },
   {
     path: '/data/projects',

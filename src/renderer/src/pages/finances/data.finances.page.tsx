@@ -2,7 +2,7 @@ import { openDialog } from '@renderer/api/main.api'
 import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import { Button } from '@renderer/components/elements/button/button.component'
 import {
-  Table,
+  TableRoot,
   TableBody,
   TableCell,
   TableHead,
@@ -110,7 +110,7 @@ export const FinancesDataPage: React.FC = () => {
       </Typography>
       <div className="flex flex-col gap-y-2">
         <Button onClick={handleOpenDialog}>Import XLS</Button>
-        <Table>
+        <TableRoot>
           <TableHeader>
             <TableRow>
               <TableHead className="w-[100px]">Value Date</TableHead>
@@ -133,7 +133,7 @@ export const FinancesDataPage: React.FC = () => {
               </TableRow>
             ))}
           </TableBody>
-        </Table>
+        </TableRoot>
       </div>
     </MainLayout>
   )

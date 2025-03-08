@@ -1,7 +1,7 @@
 import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import { Button } from '@renderer/components/elements/button/button.component'
 import {
-  Table,
+  TableRoot,
   TableBody,
   TableCell,
   TableHead,
@@ -35,8 +35,7 @@ export const AllInvoices: React.FC = () => {
         { name: 'All Invoices', path: '/invoices' }
       ]}
     >
-      <Table>
-        {/* <TableCaption>A list of your clients.</TableCaption> */}
+      <TableRoot>
         <TableHeader>
           <TableRow>
             <TableHead className="w-[100px]">Number</TableHead>
@@ -81,7 +80,7 @@ export const AllInvoices: React.FC = () => {
             </TableRow>
           ))}
         </TableBody>
-      </Table>
+      </TableRoot>
     </MainLayout>
   )
 }

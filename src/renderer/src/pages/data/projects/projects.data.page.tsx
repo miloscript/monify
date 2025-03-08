@@ -2,7 +2,7 @@ import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import { ComboBox } from '@renderer/components/atoms/combo-box/combo-box.component'
 import { Button } from '@renderer/components/elements/button/button.component'
 import {
-  Table,
+  TableRoot,
   TableBody,
   TableCaption,
   TableCell,
@@ -49,7 +49,7 @@ export const ProjectsPage: React.FC = () => {
       />
 
       {clientId && (
-        <Table>
+        <TableRoot>
           <TableCaption>A list of your projects.</TableCaption>
           <TableHeader>
             <TableRow>
@@ -82,7 +82,7 @@ export const ProjectsPage: React.FC = () => {
               </TableRow>
             ))}
           </TableBody>
-        </Table>
+        </TableRoot>
       )}
     </MainLayout>
   )

@@ -11,7 +11,7 @@ import { Button } from '@renderer/components/elements/button/button.component'
 import { FormInput } from '@renderer/components/elements/form-input/form-input.component'
 import { FormLabel } from '@renderer/components/elements/form-label/form-label.component'
 import {
-  Table,
+  TableRoot,
   TableBody,
   TableCaption,
   TableCell,
@@ -129,7 +129,7 @@ export const SettingsPage: React.FC = () => {
           ))}
         </form>
       </Form>
-      <Table>
+      <TableRoot>
         <TableCaption>A list of your fields.</TableCaption>
         <TableHeader>
           <TableRow>
@@ -154,7 +154,7 @@ export const SettingsPage: React.FC = () => {
             </TableRow>
           ))}
         </TableBody>
-      </Table>
+      </TableRoot>
       <Button form="add-label-form" variant="default">
         Submit
       </Button>
@@ -190,7 +190,7 @@ export const SettingsPage: React.FC = () => {
           ))}
         </form>
       </Form>
-      <Table>
+      <TableRoot>
         <TableCaption>A list of your fields.</TableCaption>
         <TableHeader>
           <TableRow>
@@ -215,7 +215,7 @@ export const SettingsPage: React.FC = () => {
             </TableRow>
           ))}
         </TableBody>
-      </Table>
+      </TableRoot>
     </MainLayout>
   )
 }

@@ -22,6 +22,7 @@ interface Props {
   actions?: {
     name: string
     icon?: React.ReactNode
+    variant?: 'default' | 'secondary' | 'link' | 'destructive' | 'outline' | 'ghost'
     onClick: () => void
   }[]
   crumbs?: {
@@ -35,15 +36,15 @@ export const MainLayout = ({ actions, children, crumbs, className }: Props): JSX
   const location = useLocation()
   const { height: windowHeight } = useDimensions()
 
-  const { company } = useDataStore((state) => state)
+  const { company } = useDataStore((state) => state.user)
 
   const mainAreaHeight = useMemo(() => windowHeight - 36, [windowHeight])
 
   return (
     <div className="flex flex-row">
       <Sidebar company={company} />
-      <div className="flex flex-col flex-1 ml-[240px]">
-        <header className="flex flex-row justify-start items-center border-b h-[36px] fixed w-full bg-white z-10 pl-4">
+      <div className="flex flex-col flex-1 ml-[240px] w-full">
+        <header className="flex flex-row justify-between items-center flex-1 border-b h-[36px] min-h-[36px] bg-[white] z-10 pl-4">
           <Breadcrumb>
             <BreadcrumbList>
               {crumbs &&
@@ -67,24 +68,28 @@ export const MainLayout = ({ actions, children, crumbs, className }: Props): JSX
                 })}
             </BreadcrumbList>
           </Breadcrumb>
-        </header>
-        <ScrollArea
-          className="mt-[36px]"
-          style={{
-            height: `${mainAreaHeight}px`
-          }}
-        >
           {actions && (
-            <div className="border-b px-2 py-2 flex flex-row justify-end">
+            <div className="px-2 flex flex-row items-center gap-x-2">
               {actions.map((action, index) => (
-                <Button key={index} onClick={action.onClick} variant="default" size="sm">
+                <Button
+                  size="sm"
+                  key={index}
+                  onClick={action.onClick}
+                  variant={action.variant || 'default'}
+                >
                   {action.icon}
                   {action.name}
                 </Button>
               ))}
             </div>
           )}
-          <div className={cn('px-4 py-1', className)}>{children}</div>
+        </header>
+        <ScrollArea
+          style={{
+            height: `${mainAreaHeight}px`
+          }}
+        >
+          <div className={cn(className)}>{children}</div>
         </ScrollArea>
       </div>
     </div>

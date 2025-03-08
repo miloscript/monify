@@ -74,6 +74,8 @@ const storage: StateStorage = {
 
 type DataAction = {
   setProfileInfo: (user: DataState['user'], company: DataState['user']['company']) => void
+  upsertClient: (client: DataState['user']['clients'][0]) => void
+  removeClient: (clientId: string) => void
   // addClient(client: DataState['clients'][0]): void
   // editClient(client: DataState['clients'][0]): void
   // removeClient(clientId: string): void
@@ -111,179 +113,23 @@ const useDataStore = create<DataState & DataAction>()(
               }
             }
           }
-        })
-      // clients: [],
-      // addBankAccount: (account) =>
-      //   set((state) => ({
-      //     bankAccounts: [...state.bankAccounts, account]
-      //   })),
-      // addBankTransactions: (accountId, transactions) => {
-      //   set((state) => ({
-      //     bankAccounts: state.bankAccounts.map((account) =>
-      //       account.id === accountId
-      //         ? {
-      //             ...account,
-      //             transactions: [...account.transactions, ...transactions]
-      //           }
-      //         : account
-      //     )
-      //   }))
-      // },
-
-      // addInvoice: (invoice) =>
-      //   set((state) => ({
-      //     invoices: [...state.invoices, invoice]
-      //   })),
-      // editInvoice: (invoice) =>
-      //   set((state) => ({
-      //     invoices: state.invoices.map((i) => (i.id === invoice.id ? invoice : i))
-      //   })),
-      // removeInvoice: (invoiceId) =>
-      //   set((state) => ({
-      //     invoices: state.invoices.filter((invoice) => invoice.id !== invoiceId)
-      //   })),
-
-      // editTransactionLabel: (accountId, transactionId, label) =>
-      //   set((state) => ({
-      //     accounts: state.accounts.map((account) =>
-      //       account.id === accountId
-      //         ? {
-      //             ...account,
-      //             transactions: account.transactions.map((transaction) =>
-      //               transaction.id === transactionId
-      //                 ? {
-      //                     ...transaction,
-      //                     label
-      //                   }
-      //                 : transaction
-      //             )
-      //           }
-      //         : account
-      //     )
-      //   })),
-
-      // addAccount: (account) =>
-      //   set((state) => ({
-      //     accounts: [...state.accounts, account]
-      //   })),
-
-      // addTransaction: (accountId, transaction) =>
-      //   set((state) => ({
-      //     accounts: state.accounts.map((account) =>
-      //       account.id === accountId
-      //         ? {
-      //             ...account,
-      //             transactions: [...account.transactions, transaction]
-      //           }
-      //         : account
-      //     )
-      //   })),
-
-      // clearTransactions: (accountId) =>
-      //   set((state) => ({
-      //     accounts: state.accounts.map((account) =>
-      //       account.id === accountId ? { ...account, transactions: [] } : account
-      //     )
-      //   })),
-
-      // setCompanyInfo: (payload) =>
-      //   set((state) => ({
-      //     company: {
-      //       ...state.company,
-      //       ...payload.company
-      //     }
-      //   })),
-      // addProject: (clientId, project) =>
-      //   set((state) => ({
-      //     clients: state.clients.map((client) =>
-      //       client.id === clientId
-      //         ? {
-      //             ...client,
-      //             projects: client.projects ? [...client.projects, project] : [project]
-      //           }
-      //         : client
-      //     )
-      //   })),
-      // editProject: (clientId, project) =>
-      //   set((state) => ({
-      //     clients: state.clients.map((client) =>
-      //       client.id === clientId
-      //         ? {
-      //             ...client,
-      //             projects: client.projects?.map((p) => (p.id === project.id ? project : p))
-      //           }
-      //         : client
-      //     )
-      //   })),
-      // removeProject: (clientId, projectId) =>
-      //   set((state) => ({
-      //     clients: state.clients.map((client) =>
-      //       client.id === clientId
-      //         ? {
-      //             ...client,
-      //             projects: client.projects?.filter((project) => project.id !== projectId)
-      //           }
-      //         : client
-      //     )
-      //   })),
-      // addClient: (client) =>
-      //   set((state) => ({
-      //     clients: [...state.clients, client]
-      //   })),
-      // editClient: (client) =>
-      //   set((state) => ({
-      //     clients: state.clients.map((c) => (c.id === client.id ? client : c))
-      //   })),
-      // removeClient: (clientId) =>
-      //   set((state) => ({
-      //     clients: state.clients.filter((client) => client.id !== clientId)
-      //   })),
-      // addAdditionalField: (field) =>
-      //   set((state) => ({
-      //     app: {
-      //       config: {
-      //         ...state.app.config,
-      //         project: {
-      //           additionalFields: [...state.app.config.project.additionalFields, field]
-      //         }
-      //       }
-      //     }
-      //   })),
-      // removeAdditionalField: (field) =>
-      //   set((state) => ({
-      //     app: {
-      //       config: {
-      //         ...state.app.config,
-      //         project: {
-      //           additionalFields: state.app.config.project.additionalFields.filter(
-      //             (f) => f !== field
-      //           )
-      //         }
-      //       }
-      //     }
-      //   })),
-      // addLabel: (label) =>
-      //   set((state) => ({
-      //     app: {
-      //       config: {
-      //         ...state.app.config,
-      //         transaction: {
-      //           labels: [...state.app.config.transaction.labels, label]
-      //         }
-      //       }
-      //     }
-      //   })),
-      // removeLabel: (labelId) =>
-      //   set((state) => ({
-      //     app: {
-      //       config: {
-      //         ...state.app.config,
-      //         transaction: {
-      //           labels: state.app.config.transaction.labels.filter((l) => l.id !== labelId)
-      //         }
-      //       }
-      //     }
-      //   }))
+        }),
+      upsertClient: (client) =>
+        set((state) => ({
+          user: {
+            ...state.user,
+            clients: state.user.clients.some((c) => c.id === client.id)
+              ? state.user.clients.map((c) => (c.id === client.id ? client : c))
+              : [...state.user.clients, client]
+          }
+        })),
+      removeClient: (clientId) =>
+        set((state) => ({
+          user: {
+            ...state.user,
+            clients: state.user.clients.filter((c) => c.id !== clientId)
+          }
+        }))
     }),
     {
       name: '',
