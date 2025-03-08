@@ -6,7 +6,8 @@ import {
   // Account,
   // BankAccount,
   // BankTransaction,
-  DataState
+  DataState,
+  ProjectField
   // Invoice,
   // Project,
   // Transaction,
@@ -76,6 +77,8 @@ type DataAction = {
   setProfileInfo: (user: DataState['user'], company: DataState['user']['company']) => void
   upsertClient: (client: DataState['user']['clients'][0]) => void
   removeClient: (clientId: string) => void
+  upsertProjectAdditionalField: (field: ProjectField) => void
+  removeProjectAdditionalField: (fieldId: string) => void
   // addClient(client: DataState['clients'][0]): void
   // editClient(client: DataState['clients'][0]): void
   // removeClient(clientId: string): void
@@ -128,6 +131,46 @@ const useDataStore = create<DataState & DataAction>()(
           user: {
             ...state.user,
             clients: state.user.clients.filter((c) => c.id !== clientId)
+          }
+        })),
+      upsertProjectAdditionalField: (field) =>
+        set((state) => ({
+          user: {
+            ...state.user,
+            app: {
+              ...state.user.app,
+              config: {
+                ...state.user.app.config,
+                project: {
+                  ...state.user.app.config.project,
+                  additionalFields: state.user.app.config.project.additionalFields.some(
+                    (f) => f.value === field.value
+                  )
+                    ? state.user.app.config.project.additionalFields.map((f) =>
+                        f.value === field.value ? field : f
+                      )
+                    : [...state.user.app.config.project.additionalFields, field]
+                }
+              }
+            }
+          }
+        })),
+      removeProjectAdditionalField: (fieldId) =>
+        set((state) => ({
+          user: {
+            ...state.user,
+            app: {
+              ...state.user.app,
+              config: {
+                ...state.user.app.config,
+                project: {
+                  ...state.user.app.config.project,
+                  additionalFields: state.user.app.config.project.additionalFields.filter(
+                    (f) => f.id !== fieldId
+                  )
+                }
+              }
+            }
           }
         }))
     }),

@@ -7,7 +7,6 @@ import { createHashRouter, RouterProvider } from 'react-router-dom'
 import { MainLayout } from './components/_layouts/main.layout.component'
 import { AddClientPage } from './pages/data/clients/add-client/add-client.data.page'
 import { ClientsPage } from './pages/data/clients/all-clients.data.page'
-import { EditClientPage } from './pages/data/clients/edit-client.data.page'
 import { ProfilePage } from './pages/profile/profile.data.page'
 import { DataPage } from './pages/data/data.page'
 import { ExportPage } from './pages/data/export/export.data.page'
@@ -26,7 +25,7 @@ import { AllInvoices } from './pages/invoices/all-invoices.invoices'
 import { EditInvoicePage } from './pages/invoices/edit-invoice.invoices'
 import { InvoicesPage } from './pages/invoices/invoices.page'
 import { ViewInvoicePage } from './pages/invoices/view-invoice.invoices'
-import { SettingsPage } from './pages/settings.page'
+import { SettingsPage } from './pages/settings/settings.page'
 
 const router = createHashRouter([
   {

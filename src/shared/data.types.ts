@@ -99,6 +99,11 @@ export interface BankAccount {
   transactions: BankTransaction[]
 }
 
+export type ProjectField = {
+  id: string
+  value: string
+}
+
 export interface DataState {
   user: {
     id: string
@@ -115,7 +120,7 @@ export interface DataState {
           labels: TransactionLabel[]
         }
         project: {
-          additionalFields: string[]
+          additionalFields: ProjectField[]
         }
       }
     }
