@@ -20,10 +20,12 @@ import { Button } from '../elements/button/button.component'
 interface Props {
   className?: string
   actions?: {
+    type?: 'button' | 'component'
     name: string
+    component?: React.ReactNode
     icon?: React.ReactNode
     variant?: 'default' | 'secondary' | 'link' | 'destructive' | 'outline' | 'ghost'
-    onClick: () => void
+    onClick?: () => void
   }[]
   crumbs?: {
     name: string
@@ -70,17 +72,23 @@ export const MainLayout = ({ actions, children, crumbs, className }: Props): JSX
           </Breadcrumb>
           {actions && (
             <div className="px-2 flex flex-row items-center gap-x-2">
-              {actions.map((action, index) => (
-                <Button
-                  size="sm"
-                  key={index}
-                  onClick={action.onClick}
-                  variant={action.variant || 'default'}
-                >
-                  {action.icon}
-                  {action.name}
-                </Button>
-              ))}
+              {actions.map((action, index) => {
+                if (action.type === 'component') {
+                  return action.component
+                } else {
+                  return (
+                    <Button
+                      size="sm"
+                      key={index}
+                      onClick={action.onClick}
+                      variant={action.variant || 'default'}
+                    >
+                      {action.icon}
+                      {action.name}
+                    </Button>
+                  )
+                }
+              })}
             </div>
           )}
         </header>

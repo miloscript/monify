@@ -1,24 +1,15 @@
 import { TableAction } from '@renderer/components/atoms/table/table.component'
 import { Button } from '@renderer/components/elements/button/button.component'
-import { Client } from '@shared/data.types'
+import { Project } from '@shared/data.types'
 import { createColumnHelper } from '@tanstack/react-table'
 
-export const allClientsTableConfig = (actions: TableAction<Client>[]) => {
-  const columnHelper = createColumnHelper<Client>()
+export const allProjectsTableConfig = (actions: TableAction<Project>[]) => {
+  const columnHelper = createColumnHelper<Project>()
 
   const columns = [
     columnHelper.accessor('name', {
       header: () => 'Name',
       cell: (info) => info.getValue()
-    }),
-    columnHelper.accessor((row) => row.taxId, {
-      id: 'taxId',
-      header: () => 'Tax ID',
-      cell: (info) => info.getValue()
-    }),
-    columnHelper.accessor('address.street', {
-      header: () => 'Address',
-      cell: (info) => info.renderValue()
     })
   ]
 
