@@ -94,23 +94,29 @@ export interface BankTransaction {
 export interface BankAccount {
   id: string
   number: string
+  type: 'personal' | 'business'
   bank: 'Intesa' | 'Raiffeisen' | 'Societe Generale' | 'Erste'
   transactions: BankTransaction[]
 }
 
 export interface DataState {
-  invoices: Invoice[]
-  company: Company
-  clients: Client[]
-  accounts: Account[]
-  bankAccounts: BankAccount[]
-  app: {
-    config: {
-      transaction: {
-        labels: TransactionLabel[]
-      }
-      project: {
-        additionalFields: string[]
+  user: {
+    id: string
+    name: string
+    email: string
+    company: Company
+    invoices: Invoice[]
+    clients: Client[]
+    accounts: Account[]
+    bankAccounts: BankAccount[]
+    app: {
+      config: {
+        transaction: {
+          labels: TransactionLabel[]
+        }
+        project: {
+          additionalFields: string[]
+        }
       }
     }
   }

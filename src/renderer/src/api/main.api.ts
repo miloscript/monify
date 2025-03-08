@@ -1,5 +1,5 @@
 import { DataState } from '@shared/data.types'
-import xlsx from "xlsx";
+import xlsx from 'xlsx'
 
 export const saveData = (data: DataState) => {
   window.electron.ipcRenderer.send('set-data', data)

@@ -58,11 +58,11 @@ export const Sidebar = ({ company }: SidebarProps) => {
           </CollapsibleTrigger>
           <CollapsibleContent>
             <Link
-              to="/profile/edit"
+              to="/profile"
               className={cn(
                 'text-sm font-medium flex flex-row justify-start items-center px-2.5 h-[26px] border-b',
                 'hover:bg-hover hover:underline',
-                isActive('/profile/edit') && 'bg-hover font-semibold'
+                isActive('/profile') && 'bg-hover font-semibold'
               )}
             >
               <Building2Icon className="w-4 h-5 mr-2" />

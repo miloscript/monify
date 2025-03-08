@@ -8,7 +8,7 @@ import { MainLayout } from './components/_layouts/main.layout.component'
 import { AddClientPage } from './pages/data/clients/add-client.data.page'
 import { ClientsPage } from './pages/data/clients/clients.data.page'
 import { EditClientPage } from './pages/data/clients/edit-client.data.page'
-import { CompaniesPage } from './pages/data/companies/companies.data.page'
+import { ProfilePage } from './pages/profile/profile.data.page'
 import { DataPage } from './pages/data/data.page'
 import { ExportPage } from './pages/data/export/export.data.page'
 import { AddProjectPage } from './pages/data/projects/add-project.data.page'
@@ -70,8 +70,8 @@ const router = createHashRouter([
     element: <DataPage />
   },
   {
-    path: '/profile/edit',
-    element: <CompaniesPage />
+    path: '/profile',
+    element: <ProfilePage />
   },
   {
     path: '/data/clients',
