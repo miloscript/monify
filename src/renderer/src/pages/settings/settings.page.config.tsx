@@ -12,6 +12,10 @@ export const projectFieldsTableConfig = (actions: TableAction<ProjectField>[]) =
     columnHelper.accessor('value', {
       header: () => 'Name',
       cell: (info) => info.getValue()
+    }),
+    columnHelper.accessor('index', {
+      header: () => 'Index',
+      cell: (info) => info.getValue()
     })
   ]
 
@@ -45,6 +49,11 @@ export const projectFieldsFormConfig = [
     title: 'Project additional fields',
     fields: [
       {
+        name: 'fieldIndex',
+        label: 'Field Index',
+        placeholder: 'Enter field index'
+      },
+      {
         name: 'fieldName',
         label: 'Field Name',
         placeholder: 'Enter field name'
@@ -54,6 +63,11 @@ export const projectFieldsFormConfig = [
 ]
 
 export const projectFieldsSchema = z.object({
+  fieldIndex: z
+    .string()
+    .transform((value) => value.trim())
+    .pipe(minChars(1))
+    .pipe(maxChars(60)),
   fieldName: z
     .string()
     .transform((value) => value.trim())

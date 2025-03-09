@@ -44,7 +44,7 @@ export const AddClientPage: React.FC = () => {
   })
 
   const onSubmit = (data) => {
-    const client: DataState['user']['clients'][0] = {
+    const clientData: DataState['user']['clients'][0] = {
       id: isEdit ? clientId : uuidv4(),
       name: data.companyName,
       taxId: data.taxId,
@@ -60,9 +60,10 @@ export const AddClientPage: React.FC = () => {
           rate: parseFloat(data.hourlyRate),
           dateActive: new Date()
         }
-      ]
+      ],
+      projects: isEdit ? client.projects : []
     }
-    upsertClient(client)
+    upsertClient(clientData)
     navigate('/data/clients')
   }
 

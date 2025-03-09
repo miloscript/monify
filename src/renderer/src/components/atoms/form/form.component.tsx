@@ -45,7 +45,15 @@ const FormLabel = React.forwardRef<
   const { formItemId } = useFormField()
   return (
     <div>
-      <FormLabel ref={ref} className={cn('', className)} htmlFor={formItemId} {...props} />
+      <label
+        ref={ref}
+        className={cn(
+          'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+          className
+        )}
+        htmlFor={formItemId}
+        {...props}
+      />
       {props.required && <span className="text-destructive">{REQUIRED_INDICATOR}</span>}
     </div>
   )

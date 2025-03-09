@@ -40,6 +40,7 @@ export const SettingsPage: React.FC = () => {
   const onSubmit = (data) => {
     const field: ProjectField = {
       id: uuidv4(),
+      index: data.fieldIndex,
       value: data.fieldName
     }
     upsertProjectAdditionalField(field)

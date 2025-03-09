@@ -7,6 +7,7 @@ import {
   // BankAccount,
   // BankTransaction,
   DataState,
+  Project,
   ProjectField
   // Invoice,
   // Project,
@@ -79,6 +80,7 @@ type DataAction = {
   removeClient: (clientId: string) => void
   upsertProjectAdditionalField: (field: ProjectField) => void
   removeProjectAdditionalField: (fieldId: string) => void
+  upsertProject: (project: Project) => void
   // addClient(client: DataState['clients'][0]): void
   // editClient(client: DataState['clients'][0]): void
   // removeClient(clientId: string): void
@@ -118,14 +120,16 @@ const useDataStore = create<DataState & DataAction>()(
           }
         }),
       upsertClient: (client) =>
-        set((state) => ({
-          user: {
-            ...state.user,
-            clients: state.user.clients.some((c) => c.id === client.id)
-              ? state.user.clients.map((c) => (c.id === client.id ? client : c))
-              : [...state.user.clients, client]
+        set((state) => {
+          return {
+            user: {
+              ...state.user,
+              clients: state.user.clients.some((c) => c.id === client.id)
+                ? state.user.clients.map((c) => (c.id === client.id ? client : c))
+                : [...state.user.clients, client]
+            }
           }
-        })),
+        }),
       removeClient: (clientId) =>
         set((state) => ({
           user: {
@@ -172,7 +176,25 @@ const useDataStore = create<DataState & DataAction>()(
               }
             }
           }
-        }))
+        })),
+      upsertProject: (project) =>
+        set((state) => {
+          console.log({ state })
+
+          return {
+            user: {
+              ...state.user,
+              clients: state.user.clients.some((c) => c.id === project.clientId)
+                ? state.user.clients.map((c) => ({
+                    ...c,
+                    projects: c.projects.some((p) => p.id === project.id)
+                      ? c.projects.map((p) => (p.id === project.id ? project : p))
+                      : [...c.projects, project]
+                  }))
+                : state.user.clients
+            }
+          }
+        })
     }),
     {
       name: '',

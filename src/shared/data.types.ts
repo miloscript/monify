@@ -17,10 +17,11 @@ export interface Company {
 
 export interface Project {
   id: string
+  clientId: string
   name: string
   hourlyRate: HourlyRate[]
   additionalFields?: {
-    name: string
+    field: ProjectField
     value: string
   }[]
 }
@@ -32,7 +33,7 @@ interface HourlyRate {
 
 export interface Client extends Company {
   id: string
-  projects?: Project[]
+  projects: Project[]
   hourlyRate: HourlyRate[]
 }
 
@@ -101,6 +102,7 @@ export interface BankAccount {
 
 export type ProjectField = {
   id: string
+  index: string
   value: string
 }
 
