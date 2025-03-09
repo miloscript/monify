@@ -52,7 +52,7 @@ const RegularText = ({ children, style }: { children: ReactNode; style?: any }) 
 export const ViewInvoicePage: React.FC = () => {
   const { id } = useParams()
 
-  const invoice = useDataStore((state) => state.invoices.find((invoice) => invoice.id === id))
+  const invoice = useDataStore((state) => state.user.invoices.find((invoice) => invoice.id === id))
 
   return (
     <MainLayout
@@ -207,7 +207,7 @@ export const ViewInvoicePage: React.FC = () => {
                     >
                       <RegularText style={{ padding: '8px', minWidth: '20%' }}>
                         {
-                          item.additionalFields?.find((field) => field.name === 'Cost center')
+                          item.additionalFields?.find((field) => field.field.index === 'costCenter')
                             ?.value
                         }
                       </RegularText>

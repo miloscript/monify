@@ -14,6 +14,7 @@ export const getProjectById = (state: DataState, clientId?: string, projectId?: 
   return client?.projects?.find((project) => project.id === projectId)
 }
 
-export const getInvoiceById = (state: DataState, invoiceId: string) => {
-  return state.user.invoices.find((invoice) => invoice.id === invoiceId)
+export const getInvoiceById = (state: DataState, id?: string) => {
+  if (!id) return undefined
+  return state.user.invoices.find((invoice) => invoice.id === id)
 }

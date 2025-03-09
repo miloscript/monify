@@ -82,6 +82,8 @@ type DataAction = {
   removeProjectAdditionalField: (fieldId: string) => void
   upsertProject: (project: Project) => void
   removeProject: (projectId: string) => void
+  upsertInvoice: (invoice: DataState['user']['invoices'][0]) => void
+  removeInvoice: (invoiceId: string) => void
   // addClient(client: DataState['clients'][0]): void
   // editClient(client: DataState['clients'][0]): void
   // removeClient(clientId: string): void
@@ -107,6 +109,24 @@ const useDataStore = create<DataState & DataAction>()(
   persist(
     (set) => ({
       ...initialState,
+      upsertInvoice: (invoice) =>
+        set((state) => {
+          return {
+            user: {
+              ...state.user,
+              invoices: state.user.invoices.some((i) => i.id === invoice.id)
+                ? state.user.invoices.map((i) => (i.id === invoice.id ? invoice : i))
+                : [...state.user.invoices, invoice]
+            }
+          }
+        }),
+      removeInvoice: (invoiceId) =>
+        set((state) => ({
+          user: {
+            ...state.user,
+            invoices: state.user.invoices.filter((i) => i.id !== invoiceId)
+          }
+        })),
       setProfileInfo: (user, company) =>
         set((state) => {
           return {
@@ -179,35 +199,29 @@ const useDataStore = create<DataState & DataAction>()(
           }
         })),
       upsertProject: (project) =>
-        set((state) => {
-          console.log({ state })
-
-          return {
-            user: {
-              ...state.user,
-              clients: state.user.clients.some((c) => c.id === project.clientId)
-                ? state.user.clients.map((c) => ({
-                    ...c,
-                    projects: c.projects.some((p) => p.id === project.id)
-                      ? c.projects.map((p) => (p.id === project.id ? project : p))
-                      : [...c.projects, project]
-                  }))
-                : state.user.clients
-            }
+        set((state) => ({
+          user: {
+            ...state.user,
+            clients: state.user.clients.some((c) => c.id === project.clientId)
+              ? state.user.clients.map((c) => ({
+                  ...c,
+                  projects: c.projects.some((p) => p.id === project.id)
+                    ? c.projects.map((p) => (p.id === project.id ? project : p))
+                    : [...c.projects, project]
+                }))
+              : state.user.clients
           }
-        }),
+        })),
       removeProject: (projectId) =>
-        set((state) => {
-          return {
-            user: {
-              ...state.user,
-              clients: state.user.clients.map((c) => ({
-                ...c,
-                projects: c.projects.filter((p) => p.id !== projectId)
-              }))
-            }
+        set((state) => ({
+          user: {
+            ...state.user,
+            clients: state.user.clients.map((c) => ({
+              ...c,
+              projects: c.projects.filter((p) => p.id !== projectId)
+            }))
           }
-        })
+        }))
     }),
     {
       name: '',
