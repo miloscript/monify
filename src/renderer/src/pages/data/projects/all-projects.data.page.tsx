@@ -12,14 +12,15 @@ export const ProjectsPage: React.FC = () => {
   const navigate = useNavigate()
 
   const {
-    user: { clients }
+    user: { clients },
+    removeProject
   } = useDataStore((state) => state)
 
   const [clientId, setClientId] = useState<string>(clients.length > 0 ? clients[0].id : '')
   const projects = clients.find((client) => client.id === clientId)?.projects || []
 
   const handleRemoveProject = (projectId: string) => {
-    // removeProject(clientId, projectId)
+    removeProject(projectId)
   }
 
   return (

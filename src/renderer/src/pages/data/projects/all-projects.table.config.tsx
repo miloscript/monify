@@ -10,6 +10,15 @@ export const allProjectsTableConfig = (actions: TableAction<Project>[]) => {
     columnHelper.accessor('name', {
       header: () => 'Name',
       cell: (info) => info.getValue()
+    }),
+    columnHelper.accessor('additionalFields.value', {
+      header: () => 'Cost Center',
+      cell: (info) =>
+        info.row.original.additionalFields?.find((f) => f.field.index === 'costCenter')?.value
+    }),
+    columnHelper.accessor('hourlyRate.rate', {
+      header: () => 'Hourly Rate',
+      cell: (info) => info.row.original.hourlyRate[0].rate
     })
   ]
 

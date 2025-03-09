@@ -9,11 +9,17 @@ import { MappedForm } from '@renderer/components/atoms/mapped-form/mapped-form.c
 import { useRef } from 'react'
 import { addProjectFormConfig } from './add-project.form.config'
 import { addProjectFormSchema } from './add-project.form.schema'
+import { getProjectById } from '@renderer/store/data.selectors'
 
+// TODO: the fields should be generated from the app config and not hardcoded
 export const AddProjectPage: React.FC = () => {
   const navigate = useNavigate()
-  const { clientId } = useParams()
+  const { clientId, id: projectId } = useParams()
   const formRef = useRef<HTMLFormElement>(null)
+
+  const project = getProjectById(useDataStore(), clientId, projectId)
+  const isEdit = !!project
+
   const {
     upsertProject,
     user: { app }
@@ -23,10 +29,10 @@ export const AddProjectPage: React.FC = () => {
 
   const onSubmit = (data) => {
     if (!clientId) return
-    const field = projectFields.find((field) => field.index === 'dataCenter')
+    const field = projectFields.find((field) => field.index === 'costCenter')
     if (!field) return
     const project: Project = {
-      id: uuidv4(),
+      id: isEdit ? projectId : uuidv4(),
       clientId,
       name: data.projectName,
       hourlyRate: [
@@ -38,15 +44,12 @@ export const AddProjectPage: React.FC = () => {
       additionalFields: [
         {
           field,
-          value: data.dataCenter
+          value: data.costCenter
         }
       ]
     }
-
-    console.log({ project })
-
     upsertProject(project)
-    // navigate('/data/projects')
+    navigate('/data/projects')
   }
 
   return (
@@ -80,8 +83,11 @@ export const AddProjectPage: React.FC = () => {
         ref={formRef}
         handleFormSubmit={onSubmit}
         initialValues={{
-          projectName: '',
-          hourlyRate: 0
+          projectName: project?.name || '',
+          hourlyRate: project?.hourlyRate[0].rate || 0,
+          costCenter:
+            project?.additionalFields?.find((field) => field.field.index === 'costCenter')?.value ||
+            ''
         }}
         formMap={addProjectFormConfig(projectFields)}
         validationSchema={addProjectFormSchema(projectFields)}

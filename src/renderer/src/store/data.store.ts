@@ -81,6 +81,7 @@ type DataAction = {
   upsertProjectAdditionalField: (field: ProjectField) => void
   removeProjectAdditionalField: (fieldId: string) => void
   upsertProject: (project: Project) => void
+  removeProject: (projectId: string) => void
   // addClient(client: DataState['clients'][0]): void
   // editClient(client: DataState['clients'][0]): void
   // removeClient(clientId: string): void
@@ -192,6 +193,18 @@ const useDataStore = create<DataState & DataAction>()(
                       : [...c.projects, project]
                   }))
                 : state.user.clients
+            }
+          }
+        }),
+      removeProject: (projectId) =>
+        set((state) => {
+          return {
+            user: {
+              ...state.user,
+              clients: state.user.clients.map((c) => ({
+                ...c,
+                projects: c.projects.filter((p) => p.id !== projectId)
+              }))
             }
           }
         })

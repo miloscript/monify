@@ -11,8 +11,7 @@ import { ProfilePage } from './pages/profile/profile.data.page'
 import { DataPage } from './pages/data/data.page'
 import { ExportPage } from './pages/data/export/export.data.page'
 import { AddProjectPage } from './pages/data/projects/add-project/add-project.data.page'
-import { EditProjectPage } from './pages/data/projects/edit-project.data.page'
-import { ProjectsPage } from './pages/data/projects/projects.data.page'
+import { ProjectsPage } from './pages/data/projects/all-projects.data.page'
 import { ExpensesPage } from './pages/expenses/expenses.page'
 import { ImportsPage } from './pages/expenses/imports.expenses.page'
 import { StatsPage } from './pages/expenses/stats.expenses.page'
@@ -25,7 +24,7 @@ import { AllInvoices } from './pages/invoices/all-invoices.invoices'
 import { EditInvoicePage } from './pages/invoices/edit-invoice.invoices'
 import { InvoicesPage } from './pages/invoices/invoices.page'
 import { ViewInvoicePage } from './pages/invoices/view-invoice.invoices'
-import { SettingsPage } from './pages/settings/settings.page'
+import { SettingsPage } from './pages/data/settings/settings.page'
 
 const router = createHashRouter([
   {
@@ -94,7 +93,7 @@ const router = createHashRouter([
   },
   {
     path: '/data/projects/:clientId/:id/edit',
-    element: <EditProjectPage />
+    element: <AddProjectPage />
   },
   {
     path: '/data/settings',
