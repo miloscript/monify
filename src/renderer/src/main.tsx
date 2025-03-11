@@ -24,6 +24,7 @@ import { AllInvoices } from './pages/invoices/all-invoices.invoices.page'
 import { InvoicesPage } from './pages/invoices/invoices.page'
 import { ViewInvoicePage } from './pages/invoices/view-invoice.invoices'
 import { SettingsPage } from './pages/data/settings/settings.page'
+import { AccountsPage } from './pages/data/accounts/accounts.data.page'
 
 const router = createHashRouter([
   {
@@ -69,6 +70,10 @@ const router = createHashRouter([
   {
     path: '/profile',
     element: <ProfilePage />
+  },
+  {
+    path: '/data/accounts',
+    element: <AccountsPage />
   },
   {
     path: '/data/clients',

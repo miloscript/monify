@@ -9,6 +9,9 @@ export const DataPage: React.FC = () => {
         Data
       </Typography>
       <div className="flex flex-col gap-y-2">
+        <Link to="/data/accounts">
+          <Typography element="p">Accounts</Typography>
+        </Link>
         <Link to="/data/clients">
           <Typography element="p">Clients</Typography>
         </Link>

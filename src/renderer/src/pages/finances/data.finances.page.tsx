@@ -1,31 +1,65 @@
 import { openDialog } from '@renderer/api/main.api'
 import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
-import { Button } from '@renderer/components/elements/button/button.component'
-import {
-  TableRoot,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@renderer/components/elements/table/table.component'
-import { Typography } from '@renderer/components/elements/typography/typography.component'
 import useDataStore from '@renderer/store/data.store'
-import { BankAccount, BankTransaction } from '@shared/data.types'
+import { BankAccountTypeEnum, BankBankEnum } from '../../../../shared/data.enums'
+import { BankAccount, BankTransaction } from '../../../../shared/data.types'
 import { v4 as uuidv4 } from 'uuid'
+import { Table } from '@renderer/components/atoms/table/table.component'
+import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
 
 const initialAccount: BankAccount = {
   id: 'd59be728-5128-4e75-9e91-ef2ec4bd04fb',
   number: '265110031008489974',
-  bank: 'Raiffeisen',
+  bank: BankBankEnum.Raiffeisen,
+  type: BankAccountTypeEnum.Personal,
   transactions: []
 }
 
+export const transactionsTableConfig = () => {
+  const columnHelper = createColumnHelper<BankTransaction>()
+
+  const columns = [
+    columnHelper.accessor('valueDate', {
+      header: () => 'Value Date',
+      cell: (info) => info.getValue()
+    }),
+    columnHelper.accessor('beneficiaryOrderingParty', {
+      header: () => 'Beneficiary',
+      cell: (info) => info.getValue()
+    }),
+    columnHelper.accessor('paymentPurpose', {
+      header: () => 'Purpose',
+      cell: (info) => info.renderValue()
+    }),
+    columnHelper.accessor('paymentCode', {
+      header: () => 'Payment code',
+      cell: (info) => info.renderValue()
+    }),
+    columnHelper.accessor('creditAmount', {
+      header: () => 'Credit Amount',
+      cell: (info) => info.getValue().toString()
+    }),
+    columnHelper.accessor('debitAmount', {
+      header: () => 'Debit Amount',
+      cell: (info) => info.getValue().toString()
+    }),
+    columnHelper.accessor('id', {
+      header: () => 'Actions',
+      cell: ''
+    })
+  ] as Array<ColumnDef<BankTransaction, unknown>>
+  return columns
+}
+
 export const FinancesDataPage: React.FC = () => {
-  const { addBankAccount, addBankTransactions, bankAccounts } = useDataStore((state) => state)
+  const {
+    addBankAccount,
+    addBankTransactions,
+    user: { bankAccounts }
+  } = useDataStore((state) => state)
   const { bankTransactions } = useDataStore((state) => {
     return {
-      bankTransactions: state.bankAccounts
+      bankTransactions: state.user.bankAccounts
         .filter((account) => account.number === initialAccount.number)
         .flatMap((account) => account.transactions)
     }
@@ -33,8 +67,8 @@ export const FinancesDataPage: React.FC = () => {
 
   const handleOpenDialog = async () => {
     const stringMatrix: string[][] = []
-    const bla = await openDialog()
-    const xlsData = bla.Sheets['AccountTurnover']
+    const dialog = await openDialog()
+    const xlsData = dialog.Sheets['AccountTurnover']
     Object.keys(xlsData).forEach((key) => {
       // const char = key[0];
       const number = parseInt(key.slice(1), 10)
@@ -70,7 +104,6 @@ export const FinancesDataPage: React.FC = () => {
     const filtered = parsed
       .filter((item) => item !== undefined)
       .filter((item) => !item.valueDate.includes('Prethodno stanje'))
-
     const newValues = filtered.filter(
       (item2) =>
         !bankTransactions.some(
@@ -92,11 +125,10 @@ export const FinancesDataPage: React.FC = () => {
             item1.paymentReferenceNumber === item2.paymentReferenceNumber
         )
     )
-
-    if (bankAccounts.filter((account) => account.number === initialAccount.number).length === 0) {
+    if (!bankAccounts.some((account) => account.number === initialAccount.number)) {
       addBankAccount(initialAccount)
     }
-    addBankTransactions(initialAccount.id, newValues)
+    addBankTransactions(newValues, initialAccount.id)
   }
   return (
     <MainLayout
@@ -104,37 +136,9 @@ export const FinancesDataPage: React.FC = () => {
         { name: 'Finances', path: '/finances' },
         { name: 'Finance Data', path: '/finances/data' }
       ]}
+      actions={[{ name: 'Import XLS', onClick: handleOpenDialog }]}
     >
-      <Typography element="h3" className="mb-4">
-        Finance Data
-      </Typography>
-      <div className="flex flex-col gap-y-2">
-        <Button onClick={handleOpenDialog}>Import XLS</Button>
-        <TableRoot>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">Value Date</TableHead>
-              <TableHead>Beneficiary</TableHead>
-              <TableHead>Purpose</TableHead>
-              <TableHead>Payment Code</TableHead>
-              <TableHead>Debit Amount</TableHead>
-              <TableHead>Credit Amount</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {bankTransactions.map((client) => (
-              <TableRow key={client?.id}>
-                <TableCell className="font-medium">{client?.valueDate}</TableCell>
-                <TableCell>{client?.beneficiaryOrderingParty}</TableCell>
-                <TableCell>{client?.paymentPurpose}</TableCell>
-                <TableCell>{client?.paymentCode}</TableCell>
-                <TableCell>{client?.debitAmount}</TableCell>
-                <TableCell>{client?.creditAmount}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </TableRoot>
-      </div>
+      <Table data={bankTransactions} columns={transactionsTableConfig()} />
     </MainLayout>
   )
 }

@@ -2,18 +2,7 @@ import { create } from 'zustand'
 import { StateStorage, createJSONStorage, persist } from 'zustand/middleware'
 
 import { getData, saveData } from '@renderer/api/main.api'
-import {
-  // Account,
-  // BankAccount,
-  // BankTransaction,
-  DataState,
-  Project,
-  ProjectField
-  // Invoice,
-  // Project,
-  // Transaction,
-  // TransactionLabel
-} from '@shared/data.types'
+import { BankTransaction, DataState, Project, ProjectField } from '@shared/data.types'
 
 const initialState: DataState = {
   user: {
@@ -84,31 +73,60 @@ type DataAction = {
   removeProject: (projectId: string) => void
   upsertInvoice: (invoice: DataState['user']['invoices'][0]) => void
   removeInvoice: (invoiceId: string) => void
-  // addClient(client: DataState['clients'][0]): void
-  // editClient(client: DataState['clients'][0]): void
-  // removeClient(clientId: string): void
-  // addProject(clientId: string, project: Project): void
-  // editProject(clientId: string, project: Project): void
-  // removeProject(clientId: string, projectId: string): void
-  // addAdditionalField(field: string): void
-  // removeAdditionalField(field: string): void
-  // addLabel(label: { id: string; name: string }): void
-  // removeLabel(labelId: string): void
-  // addAccount(account: Account): void
-  // addTransaction(accountId: string, transaction: Transaction): void
-  // clearTransactions(accountId: string): void
-  // editTransactionLabel(accountId: string, transactionId: string, label: TransactionLabel): void
-  // addInvoice(invoice: Invoice): void
-  // editInvoice(invoice: Invoice): void
-  // removeInvoice(invoiceId: string): void
-  // addBankAccount(account: BankAccount): void
-  // addBankTransactions(accountId: string, transaction: BankTransaction[]): void
+  addBankAccount: (account: DataState['user']['bankAccounts'][0]) => void
+  upsertBankAccount: (account: DataState['user']['bankAccounts'][0]) => void
+  removeBankAccount: (accountId: string) => void
+  addBankTransactions: (transactions: BankTransaction[], accountId: string) => void
 }
 
 const useDataStore = create<DataState & DataAction>()(
   persist(
     (set) => ({
       ...initialState,
+      addBankTransactions: (transactions, accountId) =>
+        set((state) => {
+          return {
+            user: {
+              ...state.user,
+              bankAccounts: state.user.bankAccounts.map((account) => {
+                if (account.id === accountId) {
+                  return {
+                    ...account,
+                    transactions: [...account.transactions, ...transactions]
+                  }
+                }
+                return account
+              })
+            }
+          }
+        }),
+      addBankAccount: (account) =>
+        set((state) => {
+          return {
+            user: {
+              ...state.user,
+              bankAccounts: [...state.user.bankAccounts, account]
+            }
+          }
+        }),
+      upsertBankAccount: (account) =>
+        set((state) => {
+          return {
+            user: {
+              ...state.user,
+              bankAccounts: state.user.bankAccounts.some((a) => a.id === account.id)
+                ? state.user.bankAccounts.map((a) => (a.id === account.id ? account : a))
+                : [...state.user.bankAccounts, account]
+            }
+          }
+        }),
+      removeBankAccount: (accountId) =>
+        set((state) => ({
+          user: {
+            ...state.user,
+            bankAccounts: state.user.bankAccounts.filter((a) => a.id !== accountId)
+          }
+        })),
       upsertInvoice: (invoice) =>
         set((state) => {
           return {

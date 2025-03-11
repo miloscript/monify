@@ -1,3 +1,5 @@
+import { BankAccountTypeEnum, BankBankEnum } from './data.enums'
+
 export interface Company {
   name: string
   taxId: string
@@ -95,8 +97,8 @@ export interface BankTransaction {
 export interface BankAccount {
   id: string
   number: string
-  type: 'personal' | 'business'
-  bank: 'Intesa' | 'Raiffeisen' | 'Societe Generale' | 'Erste'
+  type: BankAccountTypeEnum
+  bank: BankBankEnum
   transactions: BankTransaction[]
 }
 
