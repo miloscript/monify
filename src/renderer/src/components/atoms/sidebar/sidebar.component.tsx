@@ -8,7 +8,6 @@ import { cn } from '@renderer/lib/utils'
 import useUiStore from '@renderer/store/ui.store'
 import { Company } from '@shared/data.types'
 import {
-  BanknoteIcon,
   Building2Icon,
   ChevronsUpDownIcon,
   DatabaseIcon,
@@ -91,17 +90,6 @@ export const Sidebar = ({ company }: SidebarProps) => {
         >
           <DollarSignIcon className="w-4 h-5 mr-2" />
           Finances
-        </Link>
-        <Link
-          to="/expenses"
-          className={cn(
-            'text-sm font-medium flex flex-row justify-start items-center px-2.5 h-[26px]',
-            'hover:bg-hover hover:underline',
-            isActive('/expenses') && 'bg-hover font-semibold'
-          )}
-        >
-          <BanknoteIcon className="w-4 h-5 mr-2" />
-          Expenses
         </Link>
         <div>
           <Link

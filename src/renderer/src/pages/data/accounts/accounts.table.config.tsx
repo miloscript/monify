@@ -17,7 +17,7 @@ export const allAccountsTableConfig = (actions: TableAction<BankAccount>[]) => {
     }),
     columnHelper.accessor((row) => row.type, {
       id: 'type',
-      header: () => 'Personal',
+      header: () => 'Type',
       cell: (info) => info.renderValue()
     }),
     columnHelper.accessor('id', {

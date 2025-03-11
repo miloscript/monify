@@ -15,9 +15,6 @@ export const FinancesPage: React.FC = () => {
         <Link to="/finances/dashboard">
           <Typography element="p">Dashboard</Typography>
         </Link>
-        <Link to="/finances/expenses">
-          <Typography element="p">Expenses</Typography>
-        </Link>
       </div>
     </MainLayout>
   )
