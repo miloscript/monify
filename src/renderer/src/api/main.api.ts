@@ -13,6 +13,10 @@ export const exportAndOpenDownloads = () => {
   window.electron.ipcRenderer.send('export-and-open-downloads')
 }
 
+export const openDataFolder = () => {
+  window.electron.ipcRenderer.send('open-data-folder')
+}
+
 export const openDialog = async (): Promise<xlsx.WorkBook> => {
   return window.electron.ipcRenderer.invoke('open-dialog')
 }

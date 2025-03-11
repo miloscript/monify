@@ -1,5 +1,5 @@
 import ReactJson from '@microlink/react-json-view'
-import { exportAndOpenDownloads } from '@renderer/api/main.api'
+import { exportAndOpenDownloads, openDataFolder } from '@renderer/api/main.api'
 import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import { Button } from '@renderer/components/elements/button/button.component'
 import useDataStore from '@renderer/store/data.store'
@@ -12,11 +12,15 @@ export const ExportPage: React.FC = () => {
   const onExport = () => {
     exportAndOpenDownloads()
   }
+  const onDataFolder = () => {
+    openDataFolder()
+  }
 
   return (
     <MainLayout crumbs={[{ name: 'Data', path: '/data' }]}>
       <div className="flex flex-col items-start gap-y-4">
         <Button onClick={onExport}>Export</Button>
+        <Button onClick={onDataFolder}>Open Data Folder</Button>
         <div
           className="flex flex-row gap-x-2 items-center cursor-pointer"
           onClick={() => {

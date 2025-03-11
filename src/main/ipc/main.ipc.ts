@@ -9,7 +9,12 @@ export interface ElectronApi {
   setState: (state: DataState) => Promise<DataState>
 }
 
-type ElectronEventName = 'get-data' | 'set-data' | 'export-and-open-downloads' | 'open-dialog'
+type ElectronEventName =
+  | 'get-data'
+  | 'set-data'
+  | 'export-and-open-downloads'
+  | 'open-dialog'
+  | 'open-data-folder'
 
 type ElectronEvent = {
   name: ElectronEventName
@@ -24,7 +29,6 @@ const events: ElectronEvent[] = [
     handler: async () => {
       const stateFilePath = app.getPath('userData') + '/data/state.json'
       const state = await readStateFromFile(stateFilePath)
-      console.log(app.getPath('userData'))
       return state
     }
   },
@@ -47,6 +51,13 @@ const events: ElectronEvent[] = [
       saveStateToFile(exportFilePath, state)
 
       shell.openPath(app.getPath('downloads'))
+    }
+  },
+  {
+    name: 'open-data-folder',
+    type: 'on',
+    handler: async () => {
+      shell.openPath(app.getPath('userData'))
     }
   },
   {
