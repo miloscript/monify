@@ -32,3 +32,15 @@ $ pnpm build:mac
 # For Linux
 $ pnpm build:linux
 ```
+
+### Data Storage
+
+The application stores its data in the following locations:
+
+- Development: `~/Library/Application Support/monify-vite-electron/data/state.json`
+
+To view the current state file:
+
+```bash
+$ cat ~/Library/Application\ Support/monify-vite-electron/data/state.json
+```
