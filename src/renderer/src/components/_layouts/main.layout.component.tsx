@@ -46,7 +46,7 @@ export const MainLayout = ({ actions, children, crumbs, className }: Props): JSX
     <div className="flex flex-row">
       <Sidebar company={company} />
       <div className="flex flex-col flex-1 ml-[240px] w-full">
-        <header className="flex flex-row justify-between items-center flex-1 border-b h-[36px] min-h-[36px] bg-[white] z-10 pl-4">
+        <header className="flex flex-row justify-between items-center flex-1 border-b h-[36px] min-h-[36px] bg-background z-10 pl-4">
           <Breadcrumb>
             <BreadcrumbList>
               {crumbs &&

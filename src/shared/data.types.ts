@@ -126,6 +126,9 @@ export interface DataState {
         project: {
           additionalFields: ProjectField[]
         }
+        theme: {
+          darkMode: boolean
+        }
       }
     }
   }

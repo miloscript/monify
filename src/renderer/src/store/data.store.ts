@@ -42,6 +42,9 @@ const initialState: DataState = {
         },
         project: {
           additionalFields: []
+        },
+        theme: {
+          darkMode: false
         }
       }
     }

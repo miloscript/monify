@@ -25,6 +25,7 @@ import { InvoicesPage } from './pages/invoices/invoices.page'
 import { ViewInvoicePage } from './pages/invoices/view-invoice.invoices'
 import { SettingsPage } from './pages/data/settings/settings.page'
 import { AccountsPage } from './pages/data/accounts/accounts.data.page'
+import { ThemeProvider } from './providers/theme.provider'
 
 const router = createHashRouter([
   {
@@ -117,8 +118,10 @@ const router = createHashRouter([
   }
 ])
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <ThemeProvider>
+      <RouterProvider router={router} />
+    </ThemeProvider>
   </React.StrictMode>
 )
