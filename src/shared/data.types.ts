@@ -43,6 +43,7 @@ export interface TransactionLabel {
   accountId: string
   id: string
   name: string
+  recipient: string
 }
 
 export interface Transaction {
@@ -92,6 +93,7 @@ export interface BankTransaction {
   yourReferenceNumber: string // Vaš broj naloga | Your Reference Number
   complaintNumber: string // Broj za reklamaciju | Complaint Number
   paymentReferenceNumber: string // Referenca naloga | Payment Reference Number
+  labelId?: string // Reference to the transaction label
 }
 
 export interface BankAccount {

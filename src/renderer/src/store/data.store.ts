@@ -2,7 +2,13 @@ import { create } from 'zustand'
 import { StateStorage, createJSONStorage, persist } from 'zustand/middleware'
 
 import { getData, saveData } from '@renderer/api/main.api'
-import { BankTransaction, DataState, Project, ProjectField } from '@shared/data.types'
+import {
+  BankTransaction,
+  DataState,
+  Project,
+  ProjectField,
+  TransactionLabel
+} from '@shared/data.types'
 
 const initialState: DataState = {
   user: {
@@ -80,6 +86,12 @@ type DataAction = {
   upsertBankAccount: (account: DataState['user']['bankAccounts'][0]) => void
   removeBankAccount: (accountId: string) => void
   addBankTransactions: (transactions: BankTransaction[], accountId: string) => void
+  addLabel: (label: TransactionLabel) => void
+  updateLabel: (id: string, label: TransactionLabel) => void
+  deleteLabel: (id: string) => void
+  labelTransaction: (transactionId: string, labelId: string, accountId: string) => void
+  labelTransactions: (transactionIds: string[], labelId: string, accountId: string) => void
+  removeTransactionLabel: (transactionId: string, accountId: string) => void
 }
 
 const useDataStore = create<DataState & DataAction>()(
@@ -241,6 +253,111 @@ const useDataStore = create<DataState & DataAction>()(
               ...c,
               projects: c.projects.filter((p) => p.id !== projectId)
             }))
+          }
+        })),
+      addLabel: (label) =>
+        set((state) => ({
+          user: {
+            ...state.user,
+            app: {
+              ...state.user.app,
+              config: {
+                ...state.user.app.config,
+                transaction: {
+                  ...state.user.app.config.transaction,
+                  labels: [...state.user.app.config.transaction.labels, label]
+                }
+              }
+            }
+          }
+        })),
+      updateLabel: (id, label) =>
+        set((state) => ({
+          user: {
+            ...state.user,
+            app: {
+              ...state.user.app,
+              config: {
+                ...state.user.app.config,
+                transaction: {
+                  ...state.user.app.config.transaction,
+                  labels: state.user.app.config.transaction.labels.map((l) =>
+                    l.id === id ? label : l
+                  )
+                }
+              }
+            }
+          }
+        })),
+      deleteLabel: (id) =>
+        set((state) => ({
+          user: {
+            ...state.user,
+            app: {
+              ...state.user.app,
+              config: {
+                ...state.user.app.config,
+                transaction: {
+                  ...state.user.app.config.transaction,
+                  labels: state.user.app.config.transaction.labels.filter((l) => l.id !== id)
+                }
+              }
+            }
+          }
+        })),
+      labelTransaction: (transactionId, labelId, accountId) =>
+        set((state) => ({
+          user: {
+            ...state.user,
+            bankAccounts: state.user.bankAccounts.map((account) => {
+              if (account.id === accountId) {
+                return {
+                  ...account,
+                  transactions: account.transactions.map((transaction) =>
+                    transaction.id === transactionId ? { ...transaction, labelId } : transaction
+                  )
+                }
+              }
+              return account
+            })
+          }
+        })),
+      labelTransactions: (transactionIds, labelId, accountId) =>
+        set((state) => ({
+          user: {
+            ...state.user,
+            bankAccounts: state.user.bankAccounts.map((account) => {
+              if (account.id === accountId) {
+                return {
+                  ...account,
+                  transactions: account.transactions.map((transaction) =>
+                    transactionIds.includes(transaction.id)
+                      ? { ...transaction, labelId }
+                      : transaction
+                  )
+                }
+              }
+              return account
+            })
+          }
+        })),
+      removeTransactionLabel: (transactionId, accountId) =>
+        set((state) => ({
+          user: {
+            ...state.user,
+            bankAccounts: state.user.bankAccounts.map((account) => {
+              if (account.id === accountId) {
+                return {
+                  ...account,
+                  transactions: account.transactions.map((transaction) =>
+                    transaction.id === transactionId
+                      ? { ...transaction, labelId: undefined }
+                      : transaction
+                  )
+                }
+              }
+              return account
+            })
           }
         }))
     }),
