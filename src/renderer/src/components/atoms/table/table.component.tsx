@@ -1,3 +1,4 @@
+import { Button } from '@renderer/components/elements/button/button.component'
 import {
   TableBody,
   TableCell,
@@ -13,9 +14,13 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
+  getSortedRowModel,
   OnChangeFn,
+  SortingState,
   useReactTable
 } from '@tanstack/react-table'
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react'
+import { useState } from 'react'
 import { TableFilter } from '../table-filter/table-filter.component'
 
 export type TableAction<T> = {
@@ -31,6 +36,8 @@ type TableProps<TData, TValue> = {
   onGlobalFilterChange?: (value: string) => void
   columnFilters?: ColumnFiltersState
   onColumnFiltersChange?: OnChangeFn<ColumnFiltersState>
+  sorting?: SortingState
+  onSortingChange?: OnChangeFn<SortingState>
 }
 
 export function Table<TData, TValue>({
@@ -39,19 +46,28 @@ export function Table<TData, TValue>({
   globalFilter,
   onGlobalFilterChange,
   columnFilters,
-  onColumnFiltersChange
+  onColumnFiltersChange,
+  sorting: controlledSorting,
+  onSortingChange: controlledOnSortingChange
 }: TableProps<TData, TValue>) {
+  const [internalSorting, setInternalSorting] = useState<SortingState>([])
+  const sorting = controlledSorting ?? internalSorting
+  const onSortingChange = controlledOnSortingChange ?? setInternalSorting
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     state: {
       globalFilter,
-      columnFilters
+      columnFilters,
+      sorting
     },
     onGlobalFilterChange,
-    onColumnFiltersChange
+    onColumnFiltersChange,
+    onSortingChange
   })
 
   return (
@@ -74,9 +90,25 @@ export function Table<TData, TValue>({
                   key={header.id}
                   className={cn(index === headerGroup.headers.length - 1 && 'text-end')}
                 >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
+                  {header.isPlaceholder ? null : (
+                    <div
+                      className={cn('flex items-center gap-2', 'cursor-pointer select-none')}
+                      onClick={header.column.getToggleSortingHandler()}
+                    >
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      <Button variant="ghost" size="icon" className="h-4 w-4">
+                        {header.column.getIsSorted() ? (
+                          header.column.getIsSorted() === 'desc' ? (
+                            <ArrowDown className="h-4 w-4" />
+                          ) : (
+                            <ArrowUp className="h-4 w-4" />
+                          )
+                        ) : (
+                          <ArrowUpDown className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  )}
                 </TableHead>
               ))}
             </TableRow>
