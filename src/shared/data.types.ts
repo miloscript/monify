@@ -133,3 +133,13 @@ export interface DataState {
     }
   }
 }
+
+export interface PersonalBankTransaction {
+  id: string
+  valueDate: string // Datum valute | Value Date
+  amount: number // Amount of the transaction (positive for in, negative for out)
+  balance: number // Balance after transaction
+  description: string // Opis | Description
+  type: 'in' | 'out' // Transaction type
+  labelId?: string // Reference to the transaction label
+}

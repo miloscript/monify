@@ -32,26 +32,26 @@ const labelsTableConfig = (onDelete: (id: string) => void, onEdit: (id: string) 
   return columns
 }
 
-export const FinancesLabelsPage: React.FC = () => {
+export const PersonalLabelsPage: React.FC = () => {
   const navigate = useNavigate()
-  const { deleteLabel, user } = useDataStore((state) => ({
-    deleteLabel: state.deleteLabel,
-    user: state.user
+  const { deletePersonalLabel, personalLabels } = useDataStore((state) => ({
+    deletePersonalLabel: state.deletePersonalLabel,
+    personalLabels: state.personalLabels
   }))
 
   const handleAddLabel = () => {
-    navigate('/finances/labels/add')
+    navigate('/personal/labels/add')
   }
 
   const handleEditLabel = (id: string) => {
-    navigate(`/finances/labels/${id}/edit`)
+    navigate(`/personal/labels/${id}/edit`)
   }
 
   return (
     <MainLayout
       crumbs={[
-        { name: 'Finances', path: '/finances' },
-        { name: 'Labels', path: '/finances/labels' }
+        { name: 'Personal', path: '/personal' },
+        { name: 'Labels', path: '/personal/labels' }
       ]}
       actions={[
         {
@@ -62,8 +62,8 @@ export const FinancesLabelsPage: React.FC = () => {
       ]}
     >
       <Table
-        data={user.app.config.transaction.labels}
-        columns={labelsTableConfig(deleteLabel, handleEditLabel)}
+        data={personalLabels}
+        columns={labelsTableConfig(deletePersonalLabel, handleEditLabel)}
       />
     </MainLayout>
   )

@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback } from '@renderer/components/elements/avatar/avatar.component'
 import { cn } from '@renderer/lib/utils'
 import { Company } from '@shared/data.types'
-import { Building2Icon, DatabaseIcon, DollarSignIcon, FileIcon } from 'lucide-react'
+import { Building2Icon, DatabaseIcon, DollarSignIcon, FileIcon, UserIcon } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 
 interface SidebarProps {
@@ -23,6 +23,11 @@ const menuItems = [
     label: 'Finances',
     icon: <DollarSignIcon className="w-4 h-5 mr-2" />,
     to: '/finances'
+  },
+  {
+    label: 'Personal',
+    icon: <UserIcon className="w-4 h-5 mr-2" />,
+    to: '/personal'
   },
   {
     label: 'Data',
