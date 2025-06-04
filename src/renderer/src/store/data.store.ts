@@ -5,12 +5,21 @@ import { getData, saveData } from '@renderer/api/main.api'
 import {
   BankTransaction,
   DataState,
+  PersonalBankTransaction,
   Project,
   ProjectField,
   TransactionLabel
 } from '@shared/data.types'
 
-const initialState: DataState = {
+const initialState: DataState & {
+  personalAccounts: {
+    id: string
+    number: string
+    transactions: PersonalBankTransaction[]
+  }[]
+  personalTransactions: PersonalBankTransaction[]
+  personalLabels: TransactionLabel[]
+} = {
   user: {
     id: '',
     name: '',
@@ -54,7 +63,10 @@ const initialState: DataState = {
         }
       }
     }
-  }
+  },
+  personalAccounts: [],
+  personalTransactions: [],
+  personalLabels: []
 }
 
 // Custom storage object
@@ -92,10 +104,40 @@ type DataAction = {
   labelTransaction: (transactionId: string, labelId: string, accountId: string) => void
   labelTransactions: (transactionIds: string[], labelId: string, accountId: string) => void
   removeTransactionLabel: (transactionId: string, accountId: string) => void
+  addPersonalAccount: (account: {
+    id: string
+    number: string
+    transactions: PersonalBankTransaction[]
+  }) => void
+  upsertPersonalAccount: (account: {
+    id: string
+    number: string
+    transactions: PersonalBankTransaction[]
+  }) => void
+  removePersonalAccount: (accountId: string) => void
+  addPersonalTransactions: (transactions: PersonalBankTransaction[], accountId: string) => void
+  addPersonalLabel: (label: TransactionLabel) => void
+  updatePersonalLabel: (id: string, label: TransactionLabel) => void
+  deletePersonalLabel: (id: string) => void
+  labelPersonalTransaction: (transactionId: string, labelId: string, accountId: string) => void
+  labelPersonalTransactions: (transactionIds: string[], labelId: string, accountId: string) => void
+  removePersonalTransactionLabel: (transactionId: string, accountId: string) => void
+  clearPersonalTransactions: () => void
 }
 
-const useDataStore = create<DataState & DataAction>()(
-  persist(
+const useDataStore = create(
+  persist<
+    DataState &
+      DataAction & {
+        personalAccounts: {
+          id: string
+          number: string
+          transactions: PersonalBankTransaction[]
+        }[]
+        personalTransactions: PersonalBankTransaction[]
+        personalLabels: TransactionLabel[]
+      }
+  >(
     (set) => ({
       ...initialState,
       addBankTransactions: (transactions, accountId) =>
@@ -359,6 +401,93 @@ const useDataStore = create<DataState & DataAction>()(
               return account
             })
           }
+        })),
+      addPersonalAccount: (account) =>
+        set((state) => ({
+          personalAccounts: [...state.personalAccounts, account]
+        })),
+      upsertPersonalAccount: (account) =>
+        set((state) => ({
+          personalAccounts: state.personalAccounts.some((a) => a.id === account.id)
+            ? state.personalAccounts.map((a) => (a.id === account.id ? account : a))
+            : [...state.personalAccounts, account]
+        })),
+      removePersonalAccount: (accountId) =>
+        set((state) => ({
+          personalAccounts: state.personalAccounts.filter((a) => a.id !== accountId)
+        })),
+      addPersonalTransactions: (transactions, accountId) =>
+        set((state) => ({
+          personalAccounts: state.personalAccounts.map((account) => {
+            if (account.id === accountId) {
+              return {
+                ...account,
+                transactions: [...(account.transactions || []), ...transactions]
+              }
+            }
+            return account
+          })
+        })),
+      addPersonalLabel: (label) =>
+        set((state) => ({
+          personalLabels: [...state.personalLabels, label]
+        })),
+      updatePersonalLabel: (id, label) =>
+        set((state) => ({
+          personalLabels: state.personalLabels.map((l) => (l.id === id ? label : l))
+        })),
+      deletePersonalLabel: (id) =>
+        set((state) => ({
+          personalLabels: state.personalLabels.filter((l) => l.id !== id)
+        })),
+      labelPersonalTransaction: (transactionId, labelId, accountId) =>
+        set((state) => ({
+          personalAccounts: state.personalAccounts.map((account) => {
+            if (account.id === accountId) {
+              return {
+                ...account,
+                transactions: account.transactions.map((t) =>
+                  t.id === transactionId ? { ...t, labelId } : t
+                )
+              }
+            }
+            return account
+          })
+        })),
+      labelPersonalTransactions: (transactionIds, labelId, accountId) =>
+        set((state) => ({
+          personalAccounts: state.personalAccounts.map((account) => {
+            if (account.id === accountId) {
+              return {
+                ...account,
+                transactions: account.transactions.map((t) =>
+                  transactionIds.includes(t.id) ? { ...t, labelId } : t
+                )
+              }
+            }
+            return account
+          })
+        })),
+      removePersonalTransactionLabel: (transactionId, accountId) =>
+        set((state) => ({
+          personalAccounts: state.personalAccounts.map((account) => {
+            if (account.id === accountId) {
+              return {
+                ...account,
+                transactions: account.transactions.map((t) =>
+                  t.id === transactionId ? { ...t, labelId: undefined } : t
+                )
+              }
+            }
+            return account
+          })
+        })),
+      clearPersonalTransactions: () =>
+        set((state) => ({
+          personalAccounts: state.personalAccounts.map((account) => ({
+            ...account,
+            transactions: []
+          }))
         }))
     }),
     {

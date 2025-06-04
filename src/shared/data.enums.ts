@@ -4,5 +4,6 @@ export const enum BankAccountTypeEnum {
 }
 
 export const enum BankBankEnum {
-  Raiffeisen = 'Raiffeisen'
+  Raiffeisen = 'Raiffeisen',
+  Personal = 'Personal'
 }

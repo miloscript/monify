@@ -27,6 +27,13 @@ import { AddInvoicePage } from './pages/invoices/add-invoice/add-invoice.invoice
 import { AllInvoices } from './pages/invoices/all-invoices.invoices.page'
 import { InvoicesPage } from './pages/invoices/invoices.page'
 import { ViewInvoicePage } from './pages/invoices/view-invoice.invoices'
+import { AddLabelPersonalPage } from './pages/personal/add-label/add-label.personal.page'
+
+import { PersonalDashboardPage } from './pages/personal/dashboard.personal.page'
+import { PersonalDataPage } from './pages/personal/data.personal.page'
+import { PersonalLabelsPage } from './pages/personal/labels.personal.page'
+import { PersonalPage } from './pages/personal/personal.page'
+import { PersonalRecipientsPage } from './pages/personal/recipients.personal.page'
 import { ProfilePage } from './pages/profile/profile.data.page'
 import { ThemeProvider } from './providers/theme.provider'
 
@@ -115,6 +122,13 @@ const router = createHashRouter([
     path: '/data/export',
     element: <ExportPage />
   },
+  { path: '/personal', element: <PersonalPage /> },
+  { path: '/personal/data', element: <PersonalDataPage /> },
+  { path: '/personal/dashboard', element: <PersonalDashboardPage /> },
+  { path: '/personal/labels', element: <PersonalLabelsPage /> },
+  { path: '/personal/labels/add', element: <AddLabelPersonalPage /> },
+  { path: '/personal/labels/:id/edit', element: <AddLabelPersonalPage /> },
+  { path: '/personal/recipients', element: <PersonalRecipientsPage /> },
   {
     path: '*',
     element: (
