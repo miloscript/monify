@@ -1,11 +1,16 @@
 import { openDialog } from '@renderer/api/main.api'
 import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
+import { ComboBox } from '@renderer/components/atoms/combo-box/combo-box.component'
+import { Table } from '@renderer/components/atoms/table/table.component'
+import { Button } from '@renderer/components/elements/button/button.component'
+import { cn } from '@renderer/lib/utils'
 import useDataStore from '@renderer/store/data.store'
+import { ColumnDef, ColumnFiltersState, createColumnHelper } from '@tanstack/react-table'
+import { XIcon } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 import { BankAccountTypeEnum, BankBankEnum } from '../../../../shared/data.enums'
 import { BankAccount, BankTransaction } from '../../../../shared/data.types'
-import { v4 as uuidv4 } from 'uuid'
-import { Table } from '@renderer/components/atoms/table/table.component'
-import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
 
 const initialAccount: BankAccount = {
   id: 'd59be728-5128-4e75-9e91-ef2ec4bd04fb',
@@ -33,15 +38,26 @@ export const transactionsTableConfig = () => {
     }),
     columnHelper.accessor('paymentCode', {
       header: () => 'Payment code',
-      cell: (info) => info.renderValue()
+      cell: (info) => info.renderValue(),
+      filterFn: (row, id, value) => {
+        return value ? row.getValue(id) === value : true
+      }
     }),
     columnHelper.accessor('creditAmount', {
       header: () => 'Credit Amount',
-      cell: (info) => info.getValue().toString()
+      cell: (info) => info.getValue().toString(),
+      filterFn: (row, id, value) => {
+        const amount = row.getValue(id) as number
+        return value ? amount > 0 : true
+      }
     }),
     columnHelper.accessor('debitAmount', {
       header: () => 'Debit Amount',
-      cell: (info) => info.getValue().toString()
+      cell: (info) => info.getValue().toString(),
+      filterFn: (row, id, value) => {
+        const amount = row.getValue(id) as number
+        return value ? amount > 0 : true
+      }
     }),
     columnHelper.accessor('id', {
       header: () => 'Actions',
@@ -64,6 +80,8 @@ export const FinancesDataPage: React.FC = () => {
         .flatMap((account) => account.transactions)
     }
   })
+  const [globalFilter, setGlobalFilter] = useState('')
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
   const handleOpenDialog = async () => {
     const stringMatrix: string[][] = []
@@ -130,6 +148,19 @@ export const FinancesDataPage: React.FC = () => {
     }
     addBankTransactions(newValues, initialAccount.id)
   }
+
+  const paymentCodes = useMemo(() => {
+    const codes = new Set(bankTransactions.map((t) => t.paymentCode))
+    return Array.from(codes)
+      .filter(Boolean)
+      .map((code) => ({
+        value: code,
+        label: code
+      }))
+  }, [bankTransactions])
+
+  const selectedPaymentCode = columnFilters.find((f) => f.id === 'paymentCode')?.value as string
+
   return (
     <MainLayout
       crumbs={[
@@ -138,7 +169,84 @@ export const FinancesDataPage: React.FC = () => {
       ]}
       actions={[{ name: 'Import XLS', onClick: handleOpenDialog }]}
     >
-      <Table data={bankTransactions} columns={transactionsTableConfig()} />
+      <div className="space-y-4">
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setColumnFilters((prev) => {
+                const creditFilter = prev.find((f) => f.id === 'creditAmount')
+                return creditFilter
+                  ? prev.filter((f) => f.id !== 'creditAmount')
+                  : [...prev, { id: 'creditAmount', value: true }]
+              })
+            }}
+            className={cn(
+              columnFilters.some((f) => f.id === 'creditAmount') &&
+                'bg-primary text-primary-foreground'
+            )}
+          >
+            Show Incoming
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setColumnFilters((prev) => {
+                const debitFilter = prev.find((f) => f.id === 'debitAmount')
+                return debitFilter
+                  ? prev.filter((f) => f.id !== 'debitAmount')
+                  : [...prev, { id: 'debitAmount', value: true }]
+              })
+            }}
+            className={cn(
+              columnFilters.some((f) => f.id === 'debitAmount') &&
+                'bg-primary text-primary-foreground'
+            )}
+          >
+            Show Outgoing
+          </Button>
+          <div className="flex items-center gap-2">
+            <ComboBox
+              value={selectedPaymentCode}
+              onValueChange={(value) => {
+                setColumnFilters((prev) => {
+                  const paymentCodeFilter = prev.find((f) => f.id === 'paymentCode')
+                  return value
+                    ? paymentCodeFilter
+                      ? prev.map((f) => (f.id === 'paymentCode' ? { ...f, value } : f))
+                      : [...prev, { id: 'paymentCode', value }]
+                    : prev.filter((f) => f.id !== 'paymentCode')
+                })
+              }}
+              selectPlaceholder="Select payment code..."
+              searchPlaceholder="Search payment codes..."
+              noResultsText="No payment codes found."
+              items={paymentCodes}
+            />
+            {selectedPaymentCode && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setColumnFilters((prev) => prev.filter((f) => f.id !== 'paymentCode'))
+                }}
+              >
+                <XIcon className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+        <Table
+          data={bankTransactions}
+          columns={transactionsTableConfig()}
+          globalFilter={globalFilter}
+          onGlobalFilterChange={setGlobalFilter}
+          columnFilters={columnFilters}
+          onColumnFiltersChange={setColumnFilters}
+        />
+      </div>
     </MainLayout>
   )
 }
