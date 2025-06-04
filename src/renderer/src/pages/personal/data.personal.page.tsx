@@ -3,6 +3,7 @@ import uplateUrl from '@renderer/_import/personal_uplate.txt?url'
 import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import { ComboBox } from '@renderer/components/atoms/combo-box/combo-box.component'
 import { Table } from '@renderer/components/atoms/table/table.component'
+import { Button } from '@renderer/components/elements/button/button.component'
 import { Typography } from '@renderer/components/elements/typography/typography.component'
 import useDataStore from '@renderer/store/data.store'
 import { PersonalBankTransaction } from '@shared/data.types'
@@ -12,6 +13,7 @@ import {
   SortingState,
   createColumnHelper
 } from '@tanstack/react-table'
+import { CheckIcon, PaperclipIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -23,6 +25,11 @@ export type PersonalTableTransaction = {
   debitAmount: number
   description: string
   labelId?: string
+  attachment?: {
+    fileName: string
+    filePath: string
+    uploadedAt: string
+  }
 }
 
 export const PersonalDataPage = () => {
@@ -134,7 +141,12 @@ export const PersonalDataPage = () => {
             creditAmount,
             debitAmount,
             description: cleanRecipientDescription(description),
-            labelId: undefined
+            labelId: undefined,
+            attachment: {
+              fileName: '',
+              filePath: '',
+              uploadedAt: ''
+            }
           }
         } catch (err) {
           console.error('Error parsing line:', line, err)
@@ -217,7 +229,8 @@ export const PersonalDataPage = () => {
           balance: 0, // Not available from import
           description: t.description,
           type: t.creditAmount > 0 ? ('in' as const) : ('out' as const),
-          labelId: t.labelId
+          labelId: t.labelId,
+          attachment: t.attachment
         }))
         addPersonalTransactions(toStore, account.id)
         console.log(`Successfully added ${uniqueTransactions.length} new transactions`)
@@ -312,6 +325,20 @@ export const PersonalDataPage = () => {
               return !row.getValue(id)
             }
             return value ? row.getValue(id) === value : true
+          }
+        }),
+        columnHelper.accessor('attachment', {
+          header: () => 'Attachment',
+          cell: (info) => {
+            const attachment = info.getValue()
+            if (attachment) {
+              return <CheckIcon className="w-4 h-4 text-green-500" />
+            }
+            return (
+              <Button size="icon" variant="ghost">
+                <PaperclipIcon className="w-4 h-4" />
+              </Button>
+            )
           }
         })
       ] as ColumnDef<PersonalTableTransaction, unknown>[],
@@ -409,7 +436,8 @@ export const PersonalDataPage = () => {
             creditAmount: t.type === 'in' ? t.amount : 0,
             debitAmount: t.type === 'out' ? t.amount : 0,
             description: t.description,
-            labelId: t.labelId
+            labelId: t.labelId,
+            attachment: t.attachment
           }))}
           columnFilters={columnFilters}
           onColumnFiltersChange={setColumnFilters}

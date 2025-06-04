@@ -24,3 +24,14 @@ export const openDialog = async (): Promise<xlsx.WorkBook> => {
 export const openDirectoryDialog = async () => {
   return await window.electron.ipcRenderer.invoke('open-directory-dialog')
 }
+
+export const openAttachmentDialog = async (storagePath: string, valueDate: string) => {
+  return await window.electron.ipcRenderer.invoke('open-attachment-dialog', {
+    storagePath,
+    valueDate
+  })
+}
+
+export const deleteAttachment = async (filePath: string) => {
+  return await window.electron.ipcRenderer.invoke('delete-attachment', filePath)
+}
