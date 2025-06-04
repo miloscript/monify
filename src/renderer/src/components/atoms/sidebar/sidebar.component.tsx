@@ -1,3 +1,9 @@
+import { Avatar, AvatarFallback } from '@renderer/components/elements/avatar/avatar.component'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger
+} from '@renderer/components/elements/collapsible/collapsible.component'
 import { cn } from '@renderer/lib/utils'
 import useUiStore from '@renderer/store/ui.store'
 import { Company } from '@shared/data.types'
@@ -9,16 +15,34 @@ import {
   FileIcon
 } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger
-} from '@renderer/components/elements/collapsible/collapsible.component'
-import { Avatar, AvatarFallback } from '@renderer/components/elements/avatar/avatar.component'
 
 interface SidebarProps {
   company: Company
 }
+
+const menuItems = [
+  {
+    label: 'Profile',
+    icon: <Building2Icon className="w-4 h-5 mr-2" />,
+    to: '/profile',
+    section: 'company'
+  },
+  {
+    label: 'Invoices',
+    icon: <FileIcon className="w-4 h-5 mr-2" />,
+    to: '/'
+  },
+  {
+    label: 'Finances',
+    icon: <DollarSignIcon className="w-4 h-5 mr-2" />,
+    to: '/finances'
+  },
+  {
+    label: 'Data',
+    icon: <DatabaseIcon className="w-4 h-5 mr-2" />,
+    to: '/data'
+  }
+]
 
 export const Sidebar = ({ company }: SidebarProps) => {
   const location = useLocation()
@@ -37,6 +61,7 @@ export const Sidebar = ({ company }: SidebarProps) => {
     <aside className="fixed left-0 top-0 h-full w-[240px] border-r bg-background">
       <div className="flex flex-col h-full">
         <nav className="flex flex-col gap-y-0.5">
+          {/* Company Section (Collapsible) */}
           <Collapsible className="flex flex-col gap-y-0.5" open={sideMenu.accountDropdownOpened}>
             <CollapsibleTrigger asChild onClick={openCompanySubMenu}>
               <div
@@ -57,54 +82,41 @@ export const Sidebar = ({ company }: SidebarProps) => {
               </div>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <Link
-                to="/profile"
-                className={cn(
-                  'text-sm font-medium flex flex-row justify-start items-center px-2.5 h-[26px] border-b',
-                  'hover:bg-accent hover:text-accent-foreground',
-                  isActive('/profile') && 'bg-accent text-accent-foreground font-semibold'
-                )}
-              >
-                <Building2Icon className="w-4 h-5 mr-2" />
-                Profile
-              </Link>
+              {menuItems
+                .filter((item) => item.section === 'company')
+                .map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className={cn(
+                      'text-sm font-medium flex flex-row justify-start items-center px-2.5 h-[26px] border-b',
+                      'hover:bg-accent hover:text-accent-foreground',
+                      isActive(item.to) && 'bg-accent text-accent-foreground font-semibold'
+                    )}
+                  >
+                    {item.icon}
+                    {item.label}
+                  </Link>
+                ))}
             </CollapsibleContent>
           </Collapsible>
-          <Link
-            to="/"
-            className={cn(
-              'text-sm font-medium flex flex-row justify-start items-center px-2.5 h-[26px]',
-              'hover:bg-accent hover:text-accent-foreground',
-              isActive('/') && 'bg-accent text-accent-foreground font-semibold'
-            )}
-          >
-            <FileIcon className="w-4 h-5 mr-2" />
-            Invoices
-          </Link>
-          <Link
-            to="/finances"
-            className={cn(
-              'text-sm font-medium flex flex-row justify-start items-center px-2.5 h-[26px]',
-              'hover:bg-accent hover:text-accent-foreground',
-              isActive('/finances') && 'bg-accent text-accent-foreground font-semibold'
-            )}
-          >
-            <DollarSignIcon className="w-4 h-5 mr-2" />
-            Finances
-          </Link>
-          <div>
-            <Link
-              to="/data"
-              className={cn(
-                'text-sm font-medium flex flex-row justify-start items-center px-2.5 h-[26px]',
-                'hover:bg-accent hover:text-accent-foreground',
-                isActive('/data') && 'bg-accent text-accent-foreground font-semibold'
-              )}
-            >
-              <DatabaseIcon className="w-4 h-5 mr-2" />
-              Data
-            </Link>
-          </div>
+          {/* Main Menu Items */}
+          {menuItems
+            .filter((item) => !item.section)
+            .map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className={cn(
+                  'text-sm font-medium flex flex-row justify-start items-center px-2.5 h-[26px]',
+                  'hover:bg-accent hover:text-accent-foreground',
+                  isActive(item.to) && 'bg-accent text-accent-foreground font-semibold'
+                )}
+              >
+                {item.icon}
+                {item.label}
+              </Link>
+            ))}
         </nav>
       </div>
     </aside>
