@@ -8,7 +8,7 @@ export const FinancesPage: React.FC = () => {
       <Typography element="h3" className="mb-4">
         Finances
       </Typography>
-      <div className="flex flex-col gap-y-2">
+      <div className="flex flex-col gap-2">
         <Link to="/finances/data">
           <Typography element="p">Data</Typography>
         </Link>
@@ -17,6 +17,9 @@ export const FinancesPage: React.FC = () => {
         </Link>
         <Link to="/finances/labels">
           <Typography element="p">Labels</Typography>
+        </Link>
+        <Link to="/finances/recipients">
+          <Typography element="p">Recipients</Typography>
         </Link>
       </div>
     </MainLayout>

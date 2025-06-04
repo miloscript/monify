@@ -22,6 +22,7 @@ import { FinancesDataPage } from './pages/finances/data.finances.page'
 import { FinancesExpensesPage } from './pages/finances/expenses.finances.page'
 import { FinancesPage } from './pages/finances/finances.page'
 import { FinancesLabelsPage } from './pages/finances/labels.finances.page'
+import { FinancesRecipientsPage } from './pages/finances/recipients.finances.page'
 import { AddInvoicePage } from './pages/invoices/add-invoice/add-invoice.invoices.page'
 import { AllInvoices } from './pages/invoices/all-invoices.invoices.page'
 import { InvoicesPage } from './pages/invoices/invoices.page'
@@ -69,6 +70,7 @@ const router = createHashRouter([
   { path: '/finances/labels', element: <FinancesLabelsPage /> },
   { path: '/finances/labels/add', element: <AddLabelFinancesPage /> },
   { path: '/finances/labels/:id/edit', element: <AddLabelFinancesPage /> },
+  { path: '/finances/recipients', element: <FinancesRecipientsPage /> },
   {
     path: '/data',
     element: <DataPage />
