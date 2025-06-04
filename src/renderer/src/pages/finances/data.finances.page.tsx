@@ -1,4 +1,4 @@
-import { openDialog } from '@renderer/api/main.api'
+import { deleteAttachment, openAttachmentDialog, openDialog } from '@renderer/api/main.api'
 import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import { ComboBox } from '@renderer/components/atoms/combo-box/combo-box.component'
 import { Table } from '@renderer/components/atoms/table/table.component'
@@ -6,7 +6,7 @@ import { Button } from '@renderer/components/elements/button/button.component'
 import { cn } from '@renderer/lib/utils'
 import useDataStore from '@renderer/store/data.store'
 import { ColumnDef, ColumnFiltersState, createColumnHelper } from '@tanstack/react-table'
-import { XIcon } from 'lucide-react'
+import { CheckIcon, PaperclipIcon, Trash2Icon, XIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { BankAccountTypeEnum, BankBankEnum } from '../../../../shared/data.enums'
@@ -23,6 +23,130 @@ const initialAccount: BankAccount = {
 export const transactionsTableConfig = () => {
   const columnHelper = createColumnHelper<BankTransaction>()
   const { user } = useDataStore.getState()
+
+  const selectFileAttachment = async (transactionId: string) => {
+    try {
+      const state = useDataStore.getState()
+      const transaction = state.user.bankAccounts
+        .flatMap((account) => account.transactions)
+        .find((t) => t.id === transactionId)
+
+      if (!transaction) {
+        console.error('Transaction not found')
+        return
+      }
+
+      const storagePath = state.user.app.config.transaction.storagePath
+      if (!storagePath) {
+        console.error('No storage path configured')
+        return
+      }
+
+      const result = await openAttachmentDialog(storagePath, transaction.valueDate)
+
+      if (result.canceled || !result.filePaths.length) {
+        return
+      }
+
+      const filePath = result.filePaths[0]
+      const fileName = filePath.split('/').pop() || ''
+
+      // Update the transaction with the attachment info
+      const updatedTransaction = {
+        ...transaction,
+        attachment: {
+          fileName,
+          filePath,
+          uploadedAt: new Date().toISOString()
+        }
+      }
+      // Find the account that contains this transaction
+      const account = user.bankAccounts.find((acc) =>
+        acc.transactions.some((t) => t.id === transactionId)
+      )
+      if (account) {
+        // Update the transaction in the store
+        const updatedTransactions = account.transactions.map((t) =>
+          t.id === transactionId ? updatedTransaction : t
+        )
+        useDataStore.getState().upsertBankAccount({
+          ...account,
+          transactions: updatedTransactions
+        })
+      }
+    } catch (error) {
+      console.error('Error selecting file:', error)
+    }
+  }
+
+  const removeAttachment = async (transactionId: string, filePath: string) => {
+    try {
+      const result = await deleteAttachment(filePath)
+
+      // If deletion failed but it's because file doesn't exist, treat as success
+      const shouldRemoveFromState =
+        result.success ||
+        (result.error && result.error.includes('ENOENT')) ||
+        (result.error && result.error.includes('no such file or directory'))
+
+      if (!shouldRemoveFromState && result.error) {
+        console.error('Failed to delete file:', result.error)
+        // Still continue to remove from state for cleanup
+      }
+
+      // Update the transaction to remove attachment info regardless of file deletion result
+      const transaction = user.bankAccounts
+        .flatMap((account) => account.transactions)
+        .find((t) => t.id === transactionId)
+
+      if (transaction) {
+        const updatedTransaction = {
+          ...transaction,
+          attachment: undefined
+        }
+        // Find the account that contains this transaction
+        const account = user.bankAccounts.find((acc) =>
+          acc.transactions.some((t) => t.id === transactionId)
+        )
+        if (account) {
+          // Update the transaction in the store
+          const updatedTransactions = account.transactions.map((t) =>
+            t.id === transactionId ? updatedTransaction : t
+          )
+          useDataStore.getState().upsertBankAccount({
+            ...account,
+            transactions: updatedTransactions
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Error removing attachment:', error)
+
+      // Even if there's an error, still try to clean up the state
+      const transaction = user.bankAccounts
+        .flatMap((account) => account.transactions)
+        .find((t) => t.id === transactionId)
+
+      if (transaction) {
+        const updatedTransaction = {
+          ...transaction,
+          attachment: undefined
+        }
+        const account = user.bankAccounts.find((acc) =>
+          acc.transactions.some((t) => t.id === transactionId)
+        )
+        if (account) {
+          const updatedTransactions = account.transactions.map((t) =>
+            t.id === transactionId ? updatedTransaction : t
+          )
+          useDataStore.getState().upsertBankAccount({
+            ...account,
+            transactions: updatedTransactions
+          })
+        }
+      }
+    }
+  }
 
   const columns = [
     columnHelper.accessor('valueDate', {
@@ -69,6 +193,35 @@ export const transactionsTableConfig = () => {
       },
       filterFn: (row, id, value) => {
         return value ? row.getValue(id) === value : true
+      }
+    }),
+    columnHelper.accessor('attachment', {
+      header: () => 'Attachment',
+      cell: (info) => {
+        const attachment = info.getValue()
+        if (attachment) {
+          return (
+            <div className="flex items-center gap-2">
+              <CheckIcon className="w-4 h-4 text-green-500" />
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => removeAttachment(info.row.original.id, attachment.filePath)}
+              >
+                <Trash2Icon className="w-4 h-4 text-destructive" />
+              </Button>
+            </div>
+          )
+        }
+        return (
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={() => selectFileAttachment(info.row.original.id)}
+          >
+            <PaperclipIcon className="w-4 h-4" />
+          </Button>
+        )
       }
     }),
     columnHelper.accessor('id', {

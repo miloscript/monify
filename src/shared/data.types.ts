@@ -92,6 +92,11 @@ export interface BankTransaction {
   complaintNumber: string // Broj za reklamaciju | Complaint Number
   paymentReferenceNumber: string // Referenca naloga | Payment Reference Number
   labelId?: string // Reference to the transaction label
+  attachment?: {
+    fileName: string
+    filePath: string
+    uploadedAt: string
+  }
 }
 
 export interface BankAccount {
@@ -143,4 +148,9 @@ export interface PersonalBankTransaction {
   description: string // Opis | Description
   type: 'in' | 'out' // Transaction type
   labelId?: string // Reference to the transaction label
+  attachment?: {
+    fileName: string
+    filePath: string
+    uploadedAt: string
+  }
 }
