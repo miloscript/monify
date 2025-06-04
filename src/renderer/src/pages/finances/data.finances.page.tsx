@@ -22,6 +22,7 @@ const initialAccount: BankAccount = {
 
 export const transactionsTableConfig = () => {
   const columnHelper = createColumnHelper<BankTransaction>()
+  const { user } = useDataStore.getState()
 
   const columns = [
     columnHelper.accessor('valueDate', {
@@ -59,6 +60,17 @@ export const transactionsTableConfig = () => {
         return value ? amount > 0 : true
       }
     }),
+    columnHelper.accessor('labelId', {
+      header: () => 'Label',
+      cell: (info) => {
+        const labelId = info.getValue()
+        const label = user.app.config.transaction.labels.find((l) => l.id === labelId)
+        return label?.name || '-'
+      },
+      filterFn: (row, id, value) => {
+        return value ? row.getValue(id) === value : true
+      }
+    }),
     columnHelper.accessor('id', {
       header: () => 'Actions',
       cell: ''
@@ -73,11 +85,12 @@ export const FinancesDataPage: React.FC = () => {
     addBankTransactions,
     user: { bankAccounts }
   } = useDataStore((state) => state)
-  const { bankTransactions } = useDataStore((state) => {
+  const { bankTransactions, user } = useDataStore((state) => {
     return {
       bankTransactions: state.user.bankAccounts
         .filter((account) => account.number === initialAccount.number)
-        .flatMap((account) => account.transactions)
+        .flatMap((account) => account.transactions),
+      user: state.user
     }
   })
   const [globalFilter, setGlobalFilter] = useState('')
@@ -159,7 +172,18 @@ export const FinancesDataPage: React.FC = () => {
       }))
   }, [bankTransactions])
 
+  const labels = useMemo(() => {
+    return [
+      { value: '', label: 'All Labels' },
+      ...user.app.config.transaction.labels.map((label) => ({
+        value: label.id,
+        label: label.name
+      }))
+    ]
+  }, [user.app.config.transaction.labels])
+
   const selectedPaymentCode = columnFilters.find((f) => f.id === 'paymentCode')?.value as string
+  const selectedLabel = columnFilters.find((f) => f.id === 'labelId')?.value as string
 
   return (
     <MainLayout
@@ -231,6 +255,36 @@ export const FinancesDataPage: React.FC = () => {
                 size="icon"
                 onClick={() => {
                   setColumnFilters((prev) => prev.filter((f) => f.id !== 'paymentCode'))
+                }}
+              >
+                <XIcon className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <ComboBox
+              value={selectedLabel}
+              onValueChange={(value) => {
+                setColumnFilters((prev) => {
+                  const labelFilter = prev.find((f) => f.id === 'labelId')
+                  return value
+                    ? labelFilter
+                      ? prev.map((f) => (f.id === 'labelId' ? { ...f, value } : f))
+                      : [...prev, { id: 'labelId', value }]
+                    : prev.filter((f) => f.id !== 'labelId')
+                })
+              }}
+              selectPlaceholder="Select label..."
+              searchPlaceholder="Search labels..."
+              noResultsText="No labels found."
+              items={labels}
+            />
+            {selectedLabel && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setColumnFilters((prev) => prev.filter((f) => f.id !== 'labelId'))
                 }}
               >
                 <XIcon className="h-4 w-4" />
