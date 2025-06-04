@@ -15,6 +15,7 @@ type ElectronEventName =
   | 'export-and-open-downloads'
   | 'open-dialog'
   | 'open-data-folder'
+  | 'open-directory-dialog'
 
 type ElectronEvent = {
   name: ElectronEventName
@@ -67,6 +68,17 @@ const events: ElectronEvent[] = [
       const result = await dialog.showOpenDialog({ properties: ['openFile'] })
       const workbook = xlsx.readFile(result.filePaths[0])
       return workbook
+    }
+  },
+  {
+    name: 'open-directory-dialog',
+    type: 'handle',
+    handler: async () => {
+      const result = await dialog.showOpenDialog({
+        properties: ['openDirectory'],
+        title: 'Select Invoice Storage Directory'
+      })
+      return result
     }
   }
 ]

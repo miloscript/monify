@@ -20,3 +20,7 @@ export const openDataFolder = () => {
 export const openDialog = async (): Promise<xlsx.WorkBook> => {
   return window.electron.ipcRenderer.invoke('open-dialog')
 }
+
+export const openDirectoryDialog = async () => {
+  return await window.electron.ipcRenderer.invoke('open-directory-dialog')
+}

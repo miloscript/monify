@@ -122,6 +122,7 @@ export interface DataState {
       config: {
         transaction: {
           labels: TransactionLabel[]
+          storagePath: string
         }
         project: {
           additionalFields: ProjectField[]

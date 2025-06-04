@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { openDirectoryDialog } from '@renderer/api/main.api'
 import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import {
   Form,
@@ -7,22 +8,23 @@ import {
   FormItem,
   FormMessage
 } from '@renderer/components/atoms/form/form.component'
+import { Table } from '@renderer/components/atoms/table/table.component'
 import { Button } from '@renderer/components/elements/button/button.component'
 import { FormInput } from '@renderer/components/elements/form-input/form-input.component'
 import { FormLabel } from '@renderer/components/elements/form-label/form-label.component'
+import { useTheme } from '@renderer/providers/theme.provider'
 import useDataStore from '@renderer/store/data.store'
 import { ProjectField } from '@shared/data.types'
-import { InfoIcon, Trash2Icon, MoonIcon, SunIcon } from 'lucide-react'
+import { FolderIcon, InfoIcon, MoonIcon, SunIcon, Trash2Icon } from 'lucide-react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import * as z from 'zod'
 import { v4 as uuidv4 } from 'uuid'
-import { Table } from '@renderer/components/atoms/table/table.component'
+import * as z from 'zod'
 import {
-  projectFieldsTableConfig,
   projectFieldsFormConfig,
-  projectFieldsSchema
+  projectFieldsSchema,
+  projectFieldsTableConfig
 } from './settings.page.config'
-import { useTheme } from '@renderer/providers/theme.provider'
 
 export const SettingsPage: React.FC = () => {
   const {
@@ -31,6 +33,7 @@ export const SettingsPage: React.FC = () => {
     user: { app }
   } = useDataStore((state) => state)
   const { isDarkMode, toggleDarkMode } = useTheme()
+  const [transactionPath, setTransactionPath] = useState(app.config.transaction?.storagePath || '')
 
   const form = useForm({
     resolver: zodResolver(projectFieldsSchema),
@@ -54,6 +57,29 @@ export const SettingsPage: React.FC = () => {
     removeProjectAdditionalField(fieldId)
   }
 
+  const handleSelectTransactionPath = async () => {
+    const result = await openDirectoryDialog()
+    if (result && result.filePaths && result.filePaths[0]) {
+      setTransactionPath(result.filePaths[0])
+      // Update the store with the new path
+      useDataStore.setState((state) => ({
+        user: {
+          ...state.user,
+          app: {
+            ...state.user.app,
+            config: {
+              ...state.user.app.config,
+              transaction: {
+                ...state.user.app.config.transaction,
+                storagePath: result.filePaths[0]
+              }
+            }
+          }
+        }
+      }))
+    }
+  }
+
   return (
     <MainLayout
       crumbs={[
@@ -75,6 +101,31 @@ export const SettingsPage: React.FC = () => {
               <Button variant="outline" size="sm" onClick={toggleDarkMode} className="w-20">
                 {isDarkMode ? 'On' : 'Off'}
               </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="gap-2 flex flex-col border">
+          <div className="border-b bg-background flex flex-row justify-between items-center py-1 px-2">
+            <p className="text-sm uppercase font-medium">Transaction Storage</p>
+            <button>
+              <InfoIcon className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="px-2.5 py-1 gap-2 flex flex-col">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FolderIcon className="w-4 h-4" />
+                <span>Storage Path</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground truncate max-w-[300px]">
+                  {transactionPath || 'No path selected'}
+                </span>
+                <Button variant="outline" size="sm" onClick={handleSelectTransactionPath}>
+                  Select Path
+                </Button>
+              </div>
             </div>
           </div>
         </div>
