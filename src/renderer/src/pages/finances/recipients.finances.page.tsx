@@ -74,6 +74,7 @@ export const FinancesRecipientsPage = (): JSX.Element => {
   const { user } = useDataStore((state) => ({
     user: state.user
   }))
+  const { labelTransactions } = useDataStore()
   const [globalFilter, setGlobalFilter] = useState('')
 
   const recipientsData = useMemo(() => {
@@ -125,13 +126,15 @@ export const FinancesRecipientsPage = (): JSX.Element => {
   }, [user.bankAccounts, user.app.config.transaction.labels])
 
   const handleLabelChange = (recipient: string, labelId: string) => {
-    // Update all transactions for this recipient with the new labelId
+    // Find all transactions for this recipient across all accounts
     user.bankAccounts.forEach((account) => {
-      account.transactions.forEach((transaction) => {
-        if (transaction.beneficiaryOrderingParty === recipient) {
-          transaction.labelId = labelId || undefined
-        }
-      })
+      const transactionIds = account.transactions
+        .filter((transaction) => transaction.beneficiaryOrderingParty === recipient)
+        .map((transaction) => transaction.id)
+
+      if (transactionIds.length > 0) {
+        labelTransactions(transactionIds, labelId, account.id)
+      }
     })
   }
 
