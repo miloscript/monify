@@ -38,8 +38,14 @@ export const ComboBox = ({
   items
 }: ComboBoxProps) => {
   const [open, setOpen] = React.useState(false)
-  // check if the value is in the items and set it
+  const [searchValue, setSearchValue] = React.useState('')
   const [value, setValue] = React.useState(initialValue)
+
+  // Filter items based on search value
+  const filteredItems = React.useMemo(() => {
+    if (!searchValue) return items
+    return items.filter((item) => item.label.toLowerCase().includes(searchValue.toLowerCase()))
+  }, [items, searchValue])
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -56,10 +62,15 @@ export const ComboBox = ({
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder={searchPlaceholder} className="h-9" />
+          <CommandInput
+            placeholder={searchPlaceholder}
+            className="h-9"
+            value={searchValue}
+            onValueChange={setSearchValue}
+          />
           <CommandEmpty>{noResultsText}</CommandEmpty>
-          <CommandList>
-            {items.map((item) => (
+          <CommandList className="max-h-[300px] overflow-y-auto">
+            {filteredItems.map((item) => (
               <CommandItem
                 key={item.value}
                 value={item.value}
@@ -67,6 +78,7 @@ export const ComboBox = ({
                   setValue(currentValue === value ? '' : currentValue)
                   setOpen(false)
                   onValueChange(item.value)
+                  setSearchValue('') // Clear search after selection
                 }}
               >
                 {item.label}
