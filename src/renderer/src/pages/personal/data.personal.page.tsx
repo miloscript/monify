@@ -1,28 +1,29 @@
+import isplateUrl from '@renderer/_import/personal_isplate.txt?url'
+import uplateUrl from '@renderer/_import/personal_uplate.txt?url'
 import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import { Table } from '@renderer/components/atoms/table/table.component'
 import { Typography } from '@renderer/components/elements/typography/typography.component'
 import useDataStore from '@renderer/store/data.store'
-import { PersonalBankTransaction } from '@shared/data.types'
-import { CellContext } from '@tanstack/react-table'
-import * as pdfjsLib from 'pdfjs-dist'
+import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
-import * as pdfJS from 'pdfjs-dist'
-import pdfJSWorkerURL from 'pdfjs-dist/build/pdf.worker?url'
-pdfJS.GlobalWorkerOptions.workerSrc = pdfJSWorkerURL
+// Define a local type for the table and parsing
+export type PersonalTableTransaction = {
+  id: string
+  valueDate: string
+  creditAmount: number
+  debitAmount: number
+  description: string
+  labelId?: string
+}
 
 export const PersonalDataPage = () => {
-  const [pdfFile, setPdfFile] = useState<File | null>(null)
   const [importError, setImportError] = useState<string | null>(null)
   const [isImporting, setIsImporting] = useState(false)
-  const {
-    personalAccounts,
-    addPersonalAccount,
-    addPersonalTransactions,
-    personalLabels,
-    clearPersonalTransactions
-  } = useDataStore()
+  const { personalAccounts, addPersonalAccount, personalLabels, clearPersonalTransactions } =
+    useDataStore()
+  const [parsedTransactions, setParsedTransactions] = useState<PersonalTableTransaction[]>([])
 
   // For demo, use the first personal account or create one
   const account = personalAccounts[0] || { id: 'personal-1', number: 'personal', transactions: [] }
@@ -30,150 +31,194 @@ export const PersonalDataPage = () => {
     addPersonalAccount(account)
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setPdfFile(e.target.files[0])
-      setImportError(null)
-    }
-  }
+  // Parse transactions from text files
+  const parseTransactionsFromFiles = async (): Promise<PersonalTableTransaction[]> => {
+    try {
+      console.log('Starting to read transaction files...')
 
-  // PDF parsing logic using pdfjs-dist
-  const parsePdfToTransactions = async (): Promise<PersonalBankTransaction[]> => {
-    if (!pdfFile) throw new Error('No PDF file selected')
+      // Try to read the files
+      let incomingText: string
+      let outgoingText: string
 
-    const arrayBuffer = await pdfFile.arrayBuffer()
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
-    const transactions: PersonalBankTransaction[] = []
+      try {
+        const incomingResponse = await fetch(uplateUrl)
+        if (!incomingResponse.ok) {
+          throw new Error(
+            `Failed to read uplate.txt: ${incomingResponse.status} ${incomingResponse.statusText}`
+          )
+        }
+        incomingText = await incomingResponse.text()
+        console.log('Successfully read uplate.txt')
+      } catch (err) {
+        console.error('Error reading uplate.txt:', err)
+        throw new Error('Failed to read incoming transactions file')
+      }
 
-    console.log(pdf)
+      try {
+        const outgoingResponse = await fetch(isplateUrl)
+        if (!outgoingResponse.ok) {
+          throw new Error(
+            `Failed to read isplate.txt: ${outgoingResponse.status} ${outgoingResponse.statusText}`
+          )
+        }
+        outgoingText = await outgoingResponse.text()
+        console.log('Successfully read isplate.txt')
+      } catch (err) {
+        console.error('Error reading isplate.txt:', err)
+        throw new Error('Failed to read outgoing transactions file')
+      }
 
-    // Process each page
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i)
+      if (!incomingText && !outgoingText) {
+        throw new Error('Both transaction files are empty')
+      }
 
-      console.log(page)
+      const transactions: PersonalTableTransaction[] = []
 
-      const textContent = await page.getTextContent()
-
-      console.log(textContent)
-
-      const text = textContent.items
-        .map((item) => {
-          if ('str' in item) {
-            return item.str
+      // Helper function to parse a single line
+      const parseLine = (line: string, type: 'in' | 'out') => {
+        try {
+          const parts = line.split('\t').filter(Boolean)
+          if (parts.length < 4) {
+            console.warn('Skipping malformed line:', line)
+            return null
           }
-          return ''
-        })
-        .join(' ')
 
-      // Split text into lines and process each line
-      const lines = text.split('\n')
-      let currentBalance = 0
+          const date = parts[0]
+          const amount = parts[2]
+          const description = parts[3] || 'Unknown'
 
-      for (const line of lines) {
-        // Skip empty lines
-        if (!line.trim()) continue
+          // Skip header line
+          if (date === 'Datum valute') {
+            console.log('Skipping header line')
+            return null
+          }
 
-        // Try to parse transaction data from the line
-        // This is a simplified example - you'll need to adjust the regex patterns
-        // based on your actual PDF format
-        const dateMatch = line.match(/(\d{2}\.\d{2}\.\d{4})/)
-        const amountMatch = line.match(/([+-]?\d+[.,]\d{2})/)
-        const descriptionMatch = line.match(/([A-Za-z0-9\s]+)(?=\s*[+-]?\d+[.,]\d{2})/)
+          const parsedAmount = parseFloat(amount.replace(/\./g, '').replace(',', '.'))
+          if (isNaN(parsedAmount)) {
+            console.warn('Invalid amount in line:', line)
+            return null
+          }
 
-        if (dateMatch && amountMatch) {
-          const date = dateMatch[1]
-          const amount = parseFloat(amountMatch[1].replace(',', '.'))
-          const description = descriptionMatch ? descriptionMatch[1].trim() : 'Unknown'
+          // Set creditAmount and debitAmount
+          let creditAmount = 0
+          let debitAmount = 0
+          if (type === 'in') {
+            creditAmount = parsedAmount
+          } else {
+            debitAmount = parsedAmount
+          }
 
-          // Update balance
-          currentBalance += amount
-
-          transactions.push({
+          return {
             id: uuidv4(),
             valueDate: date,
-            amount,
-            balance: currentBalance,
+            creditAmount,
+            debitAmount,
             description,
-            type: amount > 0 ? 'in' : 'out',
             labelId: undefined
-          })
+          }
+        } catch (err) {
+          console.error('Error parsing line:', line, err)
+          return null
         }
       }
-    }
 
-    return transactions
+      // Process incoming transactions
+      console.log('Processing incoming transactions...')
+      const incomingLines = incomingText.split('\n')
+      console.log(`Found ${incomingLines.length} lines in uplate.txt`)
+
+      incomingLines.forEach((line, index) => {
+        if (!line.trim()) return
+        const transaction = parseLine(line, 'in')
+        if (transaction) {
+          transactions.push(transaction)
+        } else {
+          console.warn(`Failed to parse incoming transaction at line ${index + 1}`)
+        }
+      })
+
+      // Process outgoing transactions
+      console.log('Processing outgoing transactions...')
+      const outgoingLines = outgoingText.split('\n')
+      console.log(`Found ${outgoingLines.length} lines in isplate.txt`)
+
+      outgoingLines.forEach((line, index) => {
+        if (!line.trim()) return
+        const transaction = parseLine(line, 'out')
+        if (transaction) {
+          transactions.push(transaction)
+        } else {
+          console.warn(`Failed to parse outgoing transaction at line ${index + 1}`)
+        }
+      })
+
+      console.log(`Successfully parsed ${transactions.length} transactions`)
+      return transactions
+    } catch (err) {
+      console.error('Error in parseTransactionsFromFiles:', err)
+      throw err
+    }
   }
 
-  const handleImport = async () => {
-    if (!pdfFile) {
-      setImportError('Please select a PDF file to import.')
-      return
-    }
+  const handleSync = async () => {
     setIsImporting(true)
     setImportError(null)
     try {
-      const transactions = await parsePdfToTransactions()
-      addPersonalTransactions(transactions, account.id)
+      console.log('Starting sync process...')
+      const newTransactions = await parseTransactionsFromFiles()
+      setParsedTransactions(newTransactions)
+      console.log(`Found ${newTransactions.length} new transactions`)
     } catch (err) {
-      setImportError('Failed to parse PDF.')
-      console.error('PDF parsing error:', err)
+      const errorMessage = err instanceof Error ? err.message : 'Failed to sync transactions'
+      console.error('Sync error:', err)
+      setImportError(errorMessage)
     } finally {
       setIsImporting(false)
     }
   }
 
   // Table columns
+  const columnHelper = createColumnHelper<PersonalTableTransaction>()
   const columns = useMemo(
-    () => [
-      {
-        accessorKey: 'valueDate',
-        header: 'Date',
-        cell: (cell: CellContext<PersonalBankTransaction, unknown>) => cell.getValue() as string
-      },
-      {
-        accessorKey: 'amount',
-        header: 'Amount',
-        cell: (cell: CellContext<PersonalBankTransaction, unknown>) =>
-          new Intl.NumberFormat('sr-RS', {
-            style: 'currency',
-            currency: 'RSD',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-          }).format(cell.getValue() as number)
-      },
-      {
-        accessorKey: 'balance',
-        header: 'Balance',
-        cell: (cell: CellContext<PersonalBankTransaction, unknown>) =>
-          new Intl.NumberFormat('sr-RS', {
-            style: 'currency',
-            currency: 'RSD',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-          }).format(cell.getValue() as number)
-      },
-      {
-        accessorKey: 'description',
-        header: 'Description',
-        cell: (cell: CellContext<PersonalBankTransaction, unknown>) => cell.getValue() as string
-      },
-      {
-        accessorKey: 'type',
-        header: 'Type',
-        cell: (cell: CellContext<PersonalBankTransaction, unknown>) =>
-          cell.getValue() as 'in' | 'out'
-      },
-      {
-        accessorKey: 'labelId',
-        header: 'Label',
-        cell: (cell: CellContext<PersonalBankTransaction, unknown>) => {
-          const labelId = cell.getValue() as string | undefined
-          const label = personalLabels.find((l) => l.id === labelId)
-          return label ? label.name : '-'
-        }
-      }
-    ],
+    () =>
+      [
+        columnHelper.accessor('valueDate', {
+          header: () => 'Date',
+          cell: (info) => info.getValue()
+        }),
+        columnHelper.accessor('creditAmount', {
+          header: () => 'Credit Amount',
+          cell: (info) =>
+            new Intl.NumberFormat('sr-RS', {
+              style: 'currency',
+              currency: 'RSD',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            }).format(info.getValue())
+        }),
+        columnHelper.accessor('debitAmount', {
+          header: () => 'Debit Amount',
+          cell: (info) =>
+            new Intl.NumberFormat('sr-RS', {
+              style: 'currency',
+              currency: 'RSD',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            }).format(info.getValue())
+        }),
+        columnHelper.accessor('description', {
+          header: () => 'Description',
+          cell: (info) => info.getValue()
+        }),
+        columnHelper.accessor('labelId', {
+          header: () => 'Label',
+          cell: (info) => {
+            const labelId = info.getValue()
+            const label = personalLabels.find((l) => l.id === labelId)
+            return label ? label.name : '-'
+          }
+        })
+      ] as Array<ColumnDef<PersonalTableTransaction, unknown>>,
     [personalLabels]
   )
 
@@ -186,15 +231,13 @@ export const PersonalDataPage = () => {
     >
       <Typography element="h3">Personal Data</Typography>
       <div className="my-6 p-4 border rounded bg-muted flex flex-col gap-4 max-w-lg">
-        <label className="font-medium">Import Transactions from PDF</label>
-        <input type="file" accept="application/pdf" onChange={handleFileChange} />
         <div className="flex gap-2">
           <button
             className="px-4 py-2 rounded bg-primary text-primary-foreground hover:bg-primary/90"
-            onClick={handleImport}
+            onClick={handleSync}
             disabled={isImporting}
           >
-            {isImporting ? 'Importing...' : 'Import PDF'}
+            {isImporting ? 'Syncing...' : 'Sync Transactions'}
           </button>
           <button
             className="px-4 py-2 rounded bg-destructive text-destructive-foreground hover:bg-destructive/90"
@@ -206,7 +249,7 @@ export const PersonalDataPage = () => {
         {importError && <span className="text-destructive text-sm">{importError}</span>}
       </div>
       <div className="mt-8">
-        <Table data={account.transactions} columns={columns} />
+        <Table<PersonalTableTransaction, unknown> data={parsedTransactions} columns={columns} />
       </div>
     </MainLayout>
   )
