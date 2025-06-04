@@ -1,10 +1,17 @@
 import isplateUrl from '@renderer/_import/personal_isplate.txt?url'
 import uplateUrl from '@renderer/_import/personal_uplate.txt?url'
 import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
+import { ComboBox } from '@renderer/components/atoms/combo-box/combo-box.component'
 import { Table } from '@renderer/components/atoms/table/table.component'
 import { Typography } from '@renderer/components/elements/typography/typography.component'
 import useDataStore from '@renderer/store/data.store'
-import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
+import { PersonalBankTransaction } from '@shared/data.types'
+import {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  createColumnHelper
+} from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -21,9 +28,16 @@ export type PersonalTableTransaction = {
 export const PersonalDataPage = () => {
   const [importError, setImportError] = useState<string | null>(null)
   const [isImporting, setIsImporting] = useState(false)
-  const { personalAccounts, addPersonalAccount, personalLabels, clearPersonalTransactions } =
-    useDataStore()
-  const [parsedTransactions, setParsedTransactions] = useState<PersonalTableTransaction[]>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'valueDate', desc: true }])
+  const {
+    personalAccounts,
+    addPersonalAccount,
+    personalLabels,
+    addPersonalTransactions,
+    clearPersonalTransactions,
+    labelPersonalTransaction
+  } = useDataStore()
 
   // For demo, use the first personal account or create one
   const account = personalAccounts[0] || { id: 'personal-1', number: 'personal', transactions: [] }
@@ -35,6 +49,12 @@ export const PersonalDataPage = () => {
   const parseTransactionsFromFiles = async (): Promise<PersonalTableTransaction[]> => {
     try {
       console.log('Starting to read transaction files...')
+
+      // Helper function to clean recipient description
+      const cleanRecipientDescription = (description: string): string => {
+        // Remove numbers in braces like (34534534)
+        return description.replace(/\s*\(\d+\)\s*/g, '').trim()
+      }
 
       // Try to read the files
       let incomingText: string
@@ -113,7 +133,7 @@ export const PersonalDataPage = () => {
             valueDate: date,
             creditAmount,
             debitAmount,
-            description,
+            description: cleanRecipientDescription(description),
             labelId: undefined
           }
         } catch (err) {
@@ -166,8 +186,44 @@ export const PersonalDataPage = () => {
     try {
       console.log('Starting sync process...')
       const newTransactions = await parseTransactionsFromFiles()
-      setParsedTransactions(newTransactions)
-      console.log(`Found ${newTransactions.length} new transactions`)
+
+      // Convert existing transactions to a comparable format
+      const existingTransactions = (account.transactions as PersonalBankTransaction[]).map((t) => ({
+        valueDate: t.valueDate,
+        amount: t.type === 'in' ? t.amount : -t.amount,
+        description: t.description.trim()
+      }))
+
+      // Helper function to compare amounts with a small tolerance for floating-point precision
+      const areAmountsEqual = (a: number, b: number) => Math.abs(a - b) < 0.01
+
+      // Filter out duplicates with improved comparison
+      const uniqueTransactions = newTransactions.filter((newT) => {
+        const newAmount = newT.creditAmount - newT.debitAmount
+        return !existingTransactions.some(
+          (existingT) =>
+            existingT.valueDate === newT.valueDate &&
+            areAmountsEqual(existingT.amount, newAmount) &&
+            existingT.description === newT.description.trim()
+        )
+      })
+
+      if (uniqueTransactions.length > 0) {
+        // Convert to PersonalBankTransaction for the store
+        const toStore = uniqueTransactions.map((t) => ({
+          id: t.id,
+          valueDate: t.valueDate,
+          amount: Math.abs(t.creditAmount - t.debitAmount),
+          balance: 0, // Not available from import
+          description: t.description,
+          type: t.creditAmount > 0 ? ('in' as const) : ('out' as const),
+          labelId: t.labelId
+        }))
+        addPersonalTransactions(toStore, account.id)
+        console.log(`Successfully added ${uniqueTransactions.length} new transactions`)
+      } else {
+        console.log('No new transactions to add')
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to sync transactions'
       console.error('Sync error:', err)
@@ -184,7 +240,16 @@ export const PersonalDataPage = () => {
       [
         columnHelper.accessor('valueDate', {
           header: () => 'Date',
-          cell: (info) => info.getValue()
+          cell: (info) => info.getValue(),
+          sortingFn: (rowA, rowB) => {
+            const dateA = new Date(
+              (rowA.getValue('valueDate') as string).trim().split('.').reverse().join('-')
+            )
+            const dateB = new Date(
+              (rowB.getValue('valueDate') as string).trim().split('.').reverse().join('-')
+            )
+            return dateA.getTime() - dateB.getTime()
+          }
         }),
         columnHelper.accessor('creditAmount', {
           header: () => 'Credit Amount',
@@ -194,7 +259,12 @@ export const PersonalDataPage = () => {
               currency: 'RSD',
               minimumFractionDigits: 2,
               maximumFractionDigits: 2
-            }).format(info.getValue())
+            }).format(info.getValue()),
+          filterFn: (row, id, value) => {
+            if (!value) return true
+            const amount = row.getValue(id) as number
+            return amount > 0
+          }
         }),
         columnHelper.accessor('debitAmount', {
           header: () => 'Debit Amount',
@@ -204,7 +274,12 @@ export const PersonalDataPage = () => {
               currency: 'RSD',
               minimumFractionDigits: 2,
               maximumFractionDigits: 2
-            }).format(info.getValue())
+            }).format(info.getValue()),
+          filterFn: (row, id, value) => {
+            if (!value) return true
+            const amount = row.getValue(id) as number
+            return amount > 0
+          }
         }),
         columnHelper.accessor('description', {
           header: () => 'Description',
@@ -213,13 +288,34 @@ export const PersonalDataPage = () => {
         columnHelper.accessor('labelId', {
           header: () => 'Label',
           cell: (info) => {
-            const labelId = info.getValue()
-            const label = personalLabels.find((l) => l.id === labelId)
-            return label ? label.name : '-'
+            const labelId = info.getValue() || ''
+            return (
+              <ComboBox
+                items={[
+                  { value: '', label: 'No Label' },
+                  ...personalLabels.map((l) => ({ value: l.id, label: l.name }))
+                ]}
+                value={labelId}
+                onValueChange={(newLabelId) => {
+                  const transaction = info.row.original
+                  labelPersonalTransaction(transaction.id, newLabelId, account.id)
+                }}
+                selectPlaceholder="Select label..."
+                searchPlaceholder="Search labels..."
+                noResultsText="No labels found."
+              />
+            )
+          },
+          filterFn: (row, id, value) => {
+            if (typeof value !== 'string') return true
+            if (value === 'unlabeled') {
+              return !row.getValue(id)
+            }
+            return value ? row.getValue(id) === value : true
           }
         })
-      ] as Array<ColumnDef<PersonalTableTransaction, unknown>>,
-    [personalLabels]
+      ] as ColumnDef<PersonalTableTransaction, unknown>[],
+    [personalLabels, account.id, labelPersonalTransaction]
   )
 
   return (
@@ -241,15 +337,85 @@ export const PersonalDataPage = () => {
           </button>
           <button
             className="px-4 py-2 rounded bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            onClick={() => clearPersonalTransactions()}
+            onClick={() => {
+              if (
+                window.confirm(
+                  'Are you sure you want to clear all transactions? This action cannot be undone.'
+                )
+              ) {
+                clearPersonalTransactions()
+              }
+            }}
           >
-            Clear All Transactions
+            Clear Transactions
           </button>
         </div>
         {importError && <span className="text-destructive text-sm">{importError}</span>}
       </div>
       <div className="mt-8">
-        <Table<PersonalTableTransaction, unknown> data={parsedTransactions} columns={columns} />
+        <div className="mb-4 flex gap-4 items-center">
+          <ComboBox
+            items={[
+              { value: '', label: 'All Labels' },
+              { value: 'unlabeled', label: 'Unlabeled' },
+              ...personalLabels.map((l) => ({ value: l.id, label: l.name }))
+            ]}
+            value={(columnFilters.find((f) => f.id === 'labelId')?.value as string) || ''}
+            onValueChange={(value) => {
+              setColumnFilters((prev) => {
+                const otherFilters = prev.filter((f) => f.id !== 'labelId')
+                return value ? [...otherFilters, { id: 'labelId', value }] : otherFilters
+              })
+            }}
+            selectPlaceholder="Filter by label..."
+            searchPlaceholder="Search labels..."
+            noResultsText="No labels found."
+          />
+          {/* Credit/Debit Toggles */}
+          <button
+            className={`px-3 py-1 rounded border ${columnFilters.some((f) => f.id === 'creditAmount') ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}
+            onClick={() => {
+              setColumnFilters((prev) => {
+                const hasCredit = prev.some((f) => f.id === 'creditAmount')
+                return hasCredit
+                  ? prev.filter((f) => f.id !== 'creditAmount')
+                  : [...prev, { id: 'creditAmount', value: true }]
+              })
+            }}
+            type="button"
+          >
+            Show Credits
+          </button>
+          <button
+            className={`px-3 py-1 rounded border ${columnFilters.some((f) => f.id === 'debitAmount') ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}
+            onClick={() => {
+              setColumnFilters((prev) => {
+                const hasDebit = prev.some((f) => f.id === 'debitAmount')
+                return hasDebit
+                  ? prev.filter((f) => f.id !== 'debitAmount')
+                  : [...prev, { id: 'debitAmount', value: true }]
+              })
+            }}
+            type="button"
+          >
+            Show Debits
+          </button>
+        </div>
+        <Table<PersonalTableTransaction, unknown>
+          columns={columns}
+          data={account.transactions.map((t) => ({
+            id: t.id,
+            valueDate: t.valueDate,
+            creditAmount: t.type === 'in' ? t.amount : 0,
+            debitAmount: t.type === 'out' ? t.amount : 0,
+            description: t.description,
+            labelId: t.labelId
+          }))}
+          columnFilters={columnFilters}
+          onColumnFiltersChange={setColumnFilters}
+          sorting={sorting}
+          onSortingChange={setSorting}
+        />
       </div>
     </MainLayout>
   )

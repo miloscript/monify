@@ -1,8 +1,15 @@
 import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import { SummaryCard } from '@renderer/components/atoms/cards/summary-card.component'
 import { PieChart } from '@renderer/components/atoms/charts/pie-chart.component'
+import { ComboBox } from '@renderer/components/atoms/combo-box/combo-box.component'
 import { DatePicker } from '@renderer/components/atoms/date-picker/date-picker.component'
 import { Table } from '@renderer/components/atoms/table/table.component'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@renderer/components/elements/tooltip/tooltip.component'
 import { Typography } from '@renderer/components/elements/typography/typography.component'
 import useDataStore from '@renderer/store/data.store'
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
@@ -10,10 +17,14 @@ import { isWithinInterval, startOfDay } from 'date-fns'
 import { useMemo, useState } from 'react'
 
 // Types for dashboard tables
-interface TopTransaction {
+interface Transaction {
+  id: string
+  date: string
   recipient: string
   amount: number
   type: 'in' | 'out'
+  labelId?: string
+  labelName?: string
 }
 
 interface LabelExpense {
@@ -21,12 +32,32 @@ interface LabelExpense {
   amount: number
 }
 
-const topTransactionsTableConfig = () => {
-  const columnHelper = createColumnHelper<TopTransaction>()
+const transactionsTableConfig = () => {
+  const columnHelper = createColumnHelper<Transaction>()
   return [
+    columnHelper.accessor('date', {
+      header: () => 'Date',
+      cell: (info) => info.getValue()
+    }),
     columnHelper.accessor('recipient', {
       header: () => 'Recipient',
-      cell: (info) => info.getValue()
+      cell: (info) => {
+        const description = info.getValue()
+        const truncated =
+          description.length > 50 ? `${description.substring(0, 50)}...` : description
+        return (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="cursor-help">{truncated}</span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-[300px] break-words">{description}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )
+      }
     }),
     columnHelper.accessor('amount', {
       header: () => 'Amount',
@@ -37,8 +68,12 @@ const topTransactionsTableConfig = () => {
           minimumFractionDigits: 0,
           maximumFractionDigits: 0
         }).format(info.getValue())
+    }),
+    columnHelper.accessor('labelName', {
+      header: () => 'Label',
+      cell: (info) => info.getValue() || '-'
     })
-  ] as Array<ColumnDef<TopTransaction, unknown>>
+  ] as Array<ColumnDef<Transaction, unknown>>
 }
 
 const labelExpensesTableConfig = () => {
@@ -75,7 +110,9 @@ export const PersonalDashboardPage = (): JSX.Element => {
     to: undefined
   })
 
-  const { totalIncoming, totalOutgoing, labelSpending, topSpenders, topEarners, labelExpenses } =
+  const [selectedLabel, setSelectedLabel] = useState<string>('')
+
+  const { totalIncoming, totalOutgoing, labelSpending, topIncoming, topOutgoing, labelExpenses } =
     useMemo(() => {
       let allTransactions = personalAccounts.flatMap((account) => account.transactions)
 
@@ -89,75 +126,61 @@ export const PersonalDashboardPage = (): JSX.Element => {
         })
       }
 
-      const labelSpendingMap = new Map<string, number>()
-      const recipientAmounts = new Map<string, { incoming: number; outgoing: number }>()
-
-      allTransactions.forEach((transaction) => {
-        // Calculate totals
-        if (transaction.type === 'in' && transaction.amount > 0) {
-          const existing = recipientAmounts.get(transaction.description) || {
-            incoming: 0,
-            outgoing: 0
-          }
-          existing.incoming += transaction.amount
-          recipientAmounts.set(transaction.description, existing)
+      // Filter by label if selected
+      if (selectedLabel) {
+        if (selectedLabel === 'unlabeled') {
+          allTransactions = allTransactions.filter((t) => !t.labelId)
+        } else {
+          allTransactions = allTransactions.filter((t) => t.labelId === selectedLabel)
         }
-        if (transaction.type === 'out' && transaction.amount < 0) {
-          const existing = recipientAmounts.get(transaction.description) || {
-            incoming: 0,
-            outgoing: 0
-          }
-          existing.outgoing += Math.abs(transaction.amount)
-          recipientAmounts.set(transaction.description, existing)
+      }
 
-          // Calculate label spending
+      const labelSpendingMap = new Map<string, number>()
+
+      // Process transactions
+      const processedTransactions = allTransactions.map((transaction) => {
+        // Calculate label spending
+        if (transaction.type === 'out') {
+          let labelName = 'Unlabeled'
           if (transaction.labelId) {
             const label = personalLabels.find((l) => l.id === transaction.labelId)
             if (label) {
-              const currentAmount = labelSpendingMap.get(label.name) || 0
-              labelSpendingMap.set(label.name, currentAmount + Math.abs(transaction.amount))
+              labelName = label.name
             }
           }
+          const currentAmount = labelSpendingMap.get(labelName) || 0
+          labelSpendingMap.set(labelName, currentAmount + transaction.amount)
+        }
+
+        return {
+          id: transaction.id,
+          date: transaction.valueDate,
+          recipient: transaction.description,
+          amount: transaction.amount,
+          type: transaction.type,
+          labelId: transaction.labelId,
+          labelName: transaction.labelId
+            ? personalLabels.find((l) => l.id === transaction.labelId)?.name
+            : undefined
         }
       })
 
-      // Get top spenders and earners
-      const topSpenders = Array.from(recipientAmounts.entries())
-        .map(([recipient, amounts]) => ({
-          recipient,
-          amount: amounts.outgoing,
-          type: 'out' as const
-        }))
-        .filter((item) => item.amount > 0)
+      // Get top transactions
+      const topIncoming = processedTransactions
+        .filter((t) => t.type === 'in')
         .sort((a, b) => b.amount - a.amount)
         .slice(0, 5)
 
-      const topEarners = Array.from(recipientAmounts.entries())
-        .map(([recipient, amounts]) => ({
-          recipient,
-          amount: amounts.incoming,
-          type: 'in' as const
-        }))
-        .filter((item) => item.amount > 0)
+      const topOutgoing = processedTransactions
+        .filter((t) => t.type === 'out')
         .sort((a, b) => b.amount - a.amount)
         .slice(0, 5)
-
-      // Calculate unlabeled transactions
-      const unlabeledAmount = allTransactions.reduce((sum, transaction) => {
-        if (transaction.type === 'out' && transaction.amount < 0 && !transaction.labelId) {
-          return sum + Math.abs(transaction.amount)
-        }
-        return sum
-      }, 0)
 
       // Convert label spending to array for pie chart
-      const labelSpendingData = [
-        ...Array.from(labelSpendingMap.entries()).map(([name, value]) => ({
-          name,
-          value
-        })),
-        ...(unlabeledAmount > 0 ? [{ name: 'Unlabeled', value: unlabeledAmount }] : [])
-      ]
+      const labelSpendingData = Array.from(labelSpendingMap.entries()).map(([name, value]) => ({
+        name,
+        value
+      }))
 
       // Calculate expenses by label for the table
       const labelExpenses = Array.from(labelSpendingMap.entries())
@@ -173,13 +196,13 @@ export const PersonalDashboardPage = (): JSX.Element => {
           .reduce((sum, t) => sum + t.amount, 0),
         totalOutgoing: allTransactions
           .filter((t) => t.type === 'out')
-          .reduce((sum, t) => sum + Math.abs(t.amount), 0),
+          .reduce((sum, t) => sum + t.amount, 0),
         labelSpending: labelSpendingData,
-        topSpenders,
-        topEarners,
+        topIncoming,
+        topOutgoing,
         labelExpenses
       }
-    }, [personalAccounts, personalLabels, dateRange])
+    }, [personalAccounts, personalLabels, dateRange, selectedLabel])
 
   return (
     <MainLayout
@@ -204,8 +227,29 @@ export const PersonalDashboardPage = (): JSX.Element => {
             onClick={() => setDateRange({ from: undefined, to: undefined })}
             type="button"
           >
-            Clear All
+            Clear Dates
           </button>
+          <ComboBox
+            items={[
+              { value: '', label: 'All Labels' },
+              { value: 'unlabeled', label: 'Unlabeled' },
+              ...personalLabels.map((l) => ({ value: l.id, label: l.name }))
+            ]}
+            value={selectedLabel}
+            onValueChange={setSelectedLabel}
+            selectPlaceholder="Filter by label..."
+            searchPlaceholder="Search labels..."
+            noResultsText="No labels found."
+          />
+          {selectedLabel && (
+            <button
+              className="px-3 py-1 text-sm rounded border border-gray-300 bg-white hover:bg-gray-100 text-gray-600 transition"
+              onClick={() => setSelectedLabel('')}
+              type="button"
+            >
+              Clear Label
+            </button>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -222,16 +266,16 @@ export const PersonalDashboardPage = (): JSX.Element => {
           <div className="space-y-6">
             <div>
               <Typography element="h3" className="mb-4">
-                Top 5 Spenders
+                Top 5 Incoming Transactions
               </Typography>
-              <Table data={topSpenders} columns={topTransactionsTableConfig()} />
+              <Table data={topIncoming} columns={transactionsTableConfig()} />
             </div>
 
             <div>
               <Typography element="h3" className="mb-4">
-                Top 5 Earners
+                Top 5 Outgoing Transactions
               </Typography>
-              <Table data={topEarners} columns={topTransactionsTableConfig()} />
+              <Table data={topOutgoing} columns={transactionsTableConfig()} />
             </div>
           </div>
         </div>
