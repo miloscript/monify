@@ -170,7 +170,16 @@ export const transactionsTableConfig = () => {
     }),
     columnHelper.accessor('creditAmount', {
       header: () => 'Credit Amount',
-      cell: (info) => info.getValue().toString(),
+      cell: (info) => {
+        const amount = info.getValue()
+        if (amount === 0) return '-'
+        return new Intl.NumberFormat('sr-RS', {
+          style: 'currency',
+          currency: 'RSD',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(amount)
+      },
       filterFn: (row, id, value) => {
         const amount = row.getValue(id) as number
         return value ? amount > 0 : true
@@ -178,7 +187,16 @@ export const transactionsTableConfig = () => {
     }),
     columnHelper.accessor('debitAmount', {
       header: () => 'Debit Amount',
-      cell: (info) => info.getValue().toString(),
+      cell: (info) => {
+        const amount = info.getValue()
+        if (amount === 0) return '-'
+        return new Intl.NumberFormat('sr-RS', {
+          style: 'currency',
+          currency: 'RSD',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(amount)
+      },
       filterFn: (row, id, value) => {
         const amount = row.getValue(id) as number
         return value ? amount > 0 : true
@@ -188,8 +206,54 @@ export const transactionsTableConfig = () => {
       header: () => 'Label',
       cell: (info) => {
         const labelId = info.getValue()
-        const label = user.app.config.transaction.labels.find((l) => l.id === labelId)
-        return label?.name || '-'
+
+        const handleLabelChange = (newLabelId: string) => {
+          const transactionId = info.row.original.id
+          const transaction = user.bankAccounts
+            .flatMap((account) => account.transactions)
+            .find((t) => t.id === transactionId)
+
+          if (transaction) {
+            const updatedTransaction = {
+              ...transaction,
+              labelId: newLabelId || undefined
+            }
+
+            // Find the account that contains this transaction
+            const account = user.bankAccounts.find((acc) =>
+              acc.transactions.some((t) => t.id === transactionId)
+            )
+
+            if (account) {
+              const updatedTransactions = account.transactions.map((t) =>
+                t.id === transactionId ? updatedTransaction : t
+              )
+              useDataStore.getState().upsertBankAccount({
+                ...account,
+                transactions: updatedTransactions
+              })
+            }
+          }
+        }
+
+        const labelOptions = [
+          { value: '', label: 'No Label' },
+          ...user.app.config.transaction.labels.map((label) => ({
+            value: label.id,
+            label: label.name
+          }))
+        ]
+
+        return (
+          <ComboBox
+            value={labelId || ''}
+            onValueChange={handleLabelChange}
+            selectPlaceholder="Select label..."
+            searchPlaceholder="Search labels..."
+            noResultsText="No labels found."
+            items={labelOptions}
+          />
+        )
       },
       filterFn: (row, id, value) => {
         return value ? row.getValue(id) === value : true
@@ -222,6 +286,10 @@ export const transactionsTableConfig = () => {
             <PaperclipIcon className="w-4 h-4" />
           </Button>
         )
+      },
+      filterFn: (row, id, value) => {
+        const attachment = row.getValue(id)
+        return value ? !attachment : true
       }
     }),
     columnHelper.accessor('id', {
@@ -383,6 +451,24 @@ export const FinancesDataPage: React.FC = () => {
             )}
           >
             Show Outgoing
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setColumnFilters((prev) => {
+                const attachmentFilter = prev.find((f) => f.id === 'attachment')
+                return attachmentFilter
+                  ? prev.filter((f) => f.id !== 'attachment')
+                  : [...prev, { id: 'attachment', value: true }]
+              })
+            }}
+            className={cn(
+              columnFilters.some((f) => f.id === 'attachment') &&
+                'bg-primary text-primary-foreground'
+            )}
+          >
+            Show No Attachments
           </Button>
           <div className="flex items-center gap-2">
             <ComboBox
