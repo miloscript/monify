@@ -1,11 +1,11 @@
 {
-  "name": "monify-vite-electron",
+  "name": "monify",
   "private": true,
   "version": "1.8.0",
-  "description": "An Electron application with React and TypeScript",
+  "description": "Your personal finance management companion",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": "Monify Team",
+  "homepage": "https://monify.app",
   "build": {
     "extraMetadata": {
       "main": "out/main/index.js"
