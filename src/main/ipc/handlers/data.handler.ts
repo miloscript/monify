@@ -1,7 +1,7 @@
 import { IpcMainEvent, app } from 'electron'
 import { DataState } from '../../../shared/data.types'
-import { readStateFromFile, saveStateToFile } from '../../utils/main.utils'
 import { CreateElectronEvent } from '../types.ipc'
+import { readStateFromFile, saveStateToFile } from '../utils.ipc'
 
 export const getDataEvent: CreateElectronEvent<'get-data'> = {
   name: 'get-data',

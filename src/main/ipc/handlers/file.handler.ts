@@ -1,7 +1,7 @@
 import { app, shell } from 'electron'
 import { unlink } from 'fs/promises'
-import { exportDateFormat, readStateFromFile, saveStateToFile } from '../../utils/main.utils'
 import { CreateElectronEvent } from '../types.ipc'
+import { exportDateFormat, readStateFromFile, saveStateToFile } from '../utils.ipc'
 
 export const exportAndOpenDownloadsEvent: CreateElectronEvent<'export-and-open-downloads'> = {
   name: 'export-and-open-downloads',
