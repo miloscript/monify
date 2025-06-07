@@ -3,12 +3,12 @@ import { MainLayout } from '@renderer/components/_layouts/main.layout.component'
 import { ComboBox } from '@renderer/components/atoms/combo-box/combo-box.component'
 import { Button } from '@renderer/components/elements/button/button.component'
 import {
-  TableRoot,
   TableBody,
   TableCaption,
   TableCell,
   TableHead,
   TableHeader,
+  TableRoot,
   TableRow
 } from '@renderer/components/elements/table/table.component'
 import useDataStore from '@renderer/store/data.store'
@@ -95,7 +95,7 @@ export const ImportsPage: React.FC = () => {
   const onLabelChange = (labelId: string, transactionId: string) => {
     const label = labels.find((l) => l.id === labelId)
     if (!label) return
-    editTransactionLabel(accounts[0].id, transactionId, label)
+    editTransactionLabel(accounts[0].id, transactionId, labelId)
   }
 
   const onFilterChange = (labelId: string) => {

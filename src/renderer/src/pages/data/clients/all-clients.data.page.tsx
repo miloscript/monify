@@ -7,10 +7,7 @@ import { allClientsTableConfig } from './all-clients.table.config'
 
 export const ClientsPage: React.FC = () => {
   const navigate = useNavigate()
-  const {
-    removeClient,
-    user: { clients }
-  } = useDataStore((state) => state)
+  const { removeClient, clients } = useDataStore((state) => state)
 
   const handleRemoveClient = (clientId: string) => {
     removeClient(clientId)
