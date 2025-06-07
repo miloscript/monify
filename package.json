@@ -1,7 +1,7 @@
 {
   "name": "monify",
   "private": true,
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "Your personal finance management companion",
   "main": "./out/main/index.js",
   "author": "Monify Team",
